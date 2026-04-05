@@ -16,7 +16,9 @@ describe('AppController', () => {
 
   describe('root', () => {
     it('should return API health string', () => {
-      expect(appController.getHealth()).toBe('Rare Collectible Auction House API');
+      expect(appController.getHealth()).toBe(
+        'Rare Collectible Auction House API',
+      );
     });
   });
 });

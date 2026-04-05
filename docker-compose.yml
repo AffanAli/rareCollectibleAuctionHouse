@@ -1,0 +1,14 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: auction_house
+    ports:
+      - '5432:5432'
+    volumes:
+      - auction_pg_data:/var/lib/postgresql/data
+
+volumes:
+  auction_pg_data:
