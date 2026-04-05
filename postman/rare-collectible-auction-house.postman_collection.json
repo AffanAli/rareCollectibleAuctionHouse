@@ -1,0 +1,378 @@
+{
+  "info": {
+    "name": "Rare Collectible Auction House API",
+    "description": "NestJS + Express stub API. Import into Postman (File → Import) or run with Newman:\n\n  npx newman run postman/rare-collectible-auction-house.postman_collection.json -e postman/local.postman_environment.json\n\nCollection variables: `baseUrl`, `auctionId` (used in bid routes).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "auctionId", "value": "stub-auction-id" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET /",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/"
+          }
+        },
+        {
+          "name": "GET /test",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/test"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "GET /auth/test",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/auth/test"
+          }
+        },
+        {
+          "name": "POST /auth/register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"buyer@example.com\",\n  \"password\": \"password12\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/auth/register"
+          }
+        },
+        {
+          "name": "POST /auth/login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"buyer@example.com\",\n  \"password\": \"password12\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "GET /users/test",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/users/test"
+          }
+        },
+        {
+          "name": "GET /users/me",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/users/me"
+          }
+        },
+        {
+          "name": "PATCH /users/me",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/users/me"
+          }
+        },
+        {
+          "name": "GET /users/me/auction-history",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/users/me/auction-history"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auctions",
+      "item": [
+        {
+          "name": "GET /auctions/test",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/auctions/test"
+          }
+        },
+        {
+          "name": "GET /auctions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/auctions"
+          }
+        },
+        {
+          "name": "POST /auctions",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Vintage stamp sheet\",\n  \"description\": \"Mint condition commemorative sheet from 1970.\",\n  \"endsAt\": \"2026-12-31T23:59:59.000Z\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/auctions"
+          }
+        },
+        {
+          "name": "GET /auctions/:id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/auctions/{{auctionId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Bids",
+      "item": [
+        {
+          "name": "GET /bids/test",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/bids/test"
+          }
+        },
+        {
+          "name": "GET /auctions/:auctionId/bids",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/auctions/{{auctionId}}/bids"
+          }
+        },
+        {
+          "name": "POST /auctions/:auctionId/bids",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 150.5\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/auctions/{{auctionId}}/bids"
+          }
+        },
+        {
+          "name": "GET /users/me/bids",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/users/me/bids"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Messages",
+      "item": [
+        {
+          "name": "GET /messages/test",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/messages/test"
+          }
+        },
+        {
+          "name": "GET /messages",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/messages"
+          }
+        },
+        {
+          "name": "POST /messages",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"auctionId\": \"{{auctionId}}\",\n  \"body\": \"Is local pickup available?\",\n  \"recipientUserId\": \"seller-user-id\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/messages"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "GET /notifications/test",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/notifications/test"
+          }
+        },
+        {
+          "name": "GET /notifications",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/notifications"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Disputes",
+      "item": [
+        {
+          "name": "GET /disputes/test",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/disputes/test"
+          }
+        },
+        {
+          "name": "GET /disputes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/disputes"
+          }
+        },
+        {
+          "name": "POST /disputes",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"auctionId\": \"{{auctionId}}\",\n  \"description\": \"Item condition did not match the listing description.\",\n  \"evidenceUrl\": \"https://example.com/photo.jpg\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/disputes"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "GET /payments/test",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/payments/test"
+          }
+        },
+        {
+          "name": "GET /payments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/payments"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "GET /admin/test",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/admin/test"
+          }
+        },
+        {
+          "name": "GET /admin/users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/admin/users"
+          }
+        },
+        {
+          "name": "GET /admin/auctions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/admin/auctions"
+          }
+        },
+        {
+          "name": "GET /admin/bids",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/admin/bids"
+          }
+        },
+        {
+          "name": "GET /admin/messages",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/admin/messages"
+          }
+        },
+        {
+          "name": "GET /admin/notifications",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/admin/notifications"
+          }
+        },
+        {
+          "name": "GET /admin/disputes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/admin/disputes"
+          }
+        },
+        {
+          "name": "GET /admin/payments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/admin/payments"
+          }
+        }
+      ]
+    }
+  ]
+}
