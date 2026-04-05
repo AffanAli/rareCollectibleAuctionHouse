@@ -1,6 +1,7 @@
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -14,7 +15,7 @@ export class AuctionImage {
   id: string;
 
   @ManyToOne(() => Auction, (auction) => auction.images, {
-    onDelete: 'CASCADE',
+    onDelete: 'NO ACTION',
   })
   @JoinColumn({ name: 'auction_id' })
   auction: Auction;
@@ -27,4 +28,7 @@ export class AuctionImage {
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
+
+  @DeleteDateColumn({ name: 'deleted_at', type: 'timestamptz', nullable: true })
+  deletedAt: Date | null;
 }

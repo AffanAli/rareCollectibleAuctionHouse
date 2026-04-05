@@ -165,10 +165,18 @@ export class InitialSchema1743345600000 implements MigrationInterface {
     await queryRunner.query(
       `CREATE INDEX "IDX_bids_auction_created" ON "bids" ("auction_id", "created_at");`,
     );
-    await queryRunner.query(`CREATE INDEX "IDX_notifications_user" ON "notifications" ("user_id");`);
-    await queryRunner.query(`CREATE INDEX "IDX_messages_auction" ON "messages" ("auction_id");`);
-    await queryRunner.query(`CREATE INDEX "IDX_auctions_seller" ON "auctions" ("seller_id");`);
-    await queryRunner.query(`CREATE INDEX "IDX_disputes_auction" ON "disputes" ("auction_id");`);
+    await queryRunner.query(
+      `CREATE INDEX "IDX_notifications_user" ON "notifications" ("user_id");`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_messages_auction" ON "messages" ("auction_id");`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_auctions_seller" ON "auctions" ("seller_id");`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "IDX_disputes_auction" ON "disputes" ("auction_id");`,
+    );
   }
 
   /**
@@ -193,8 +201,12 @@ export class InitialSchema1743345600000 implements MigrationInterface {
     await queryRunner.query(
       `ALTER TABLE "auctions" DROP CONSTRAINT IF EXISTS "FK_auctions_current_high_bid";`,
     );
-    await queryRunner.query(`ALTER TABLE "auctions" DROP COLUMN IF EXISTS "winning_bid_id";`);
-    await queryRunner.query(`ALTER TABLE "auctions" DROP COLUMN IF EXISTS "current_high_bid_id";`);
+    await queryRunner.query(
+      `ALTER TABLE "auctions" DROP COLUMN IF EXISTS "winning_bid_id";`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "auctions" DROP COLUMN IF EXISTS "current_high_bid_id";`,
+    );
 
     await queryRunner.query(`DROP TABLE IF EXISTS "bids" CASCADE;`);
     await queryRunner.query(`DROP TABLE IF EXISTS "auction_images" CASCADE;`);

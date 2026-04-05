@@ -1,12 +1,13 @@
-# Rare Collectible Auction House — architecture and data model
+# Rare Collectible Auction House — entity–relationship diagram
 
-This document summarizes how the NestJS backend is structured and how domain entities relate in PostgreSQL (TypeORM).
+All tables support **soft deletion** via a nullable **`deleted_at`** (`TIMESTAMPTZ`). When set, the row is treated as removed by the application while foreign keys remain valid (no `DELETE` on parent rows in normal flows).
 
----
+**Referential actions (PostgreSQL):**
 
-## 1. Entity–relationship diagram (ERD)
+- **`ON DELETE NO ACTION`** on required foreign keys — prevents accidental **hard** deletes while child rows still reference a parent. The app should **soft-delete** parents and optionally soft-delete or hide children in service logic instead of relying on `CASCADE`.
+- **`ON DELETE SET NULL`** only on **nullable** optional links (`current_high_bid_id`, `winning_bid_id`, `recipient_id`, `notifications.auction_id`, `payments.auction_id`, `disputes.resolved_by_admin_id`) so a rare physical removal of the referenced row does not block the database.
 
-Core rule: **bids** belong to one **auction** and one **bidder** (**user**). An **auction** optionally points to a single row in **bids** for the current highest offer and (when ended) the winning bid—those are foreign keys on `auctions`, not separate tables.
+TypeORM maps `deleted_at` with `@DeleteDateColumn`; default queries omit soft-deleted rows unless you use `withDeleted()`.
 
 ```mermaid
 erDiagram
@@ -21,6 +22,7 @@ erDiagram
     boolean is_active
     timestamptz created_at
     timestamptz updated_at
+    timestamptz deleted_at
   }
 
   auctions {
@@ -34,9 +36,9 @@ erDiagram
     numeric starting_price
     uuid current_high_bid_id FK
     uuid winning_bid_id FK
-    boolean is_deleted
     timestamptz created_at
     timestamptz updated_at
+    timestamptz deleted_at
   }
 
   auction_images {
@@ -45,6 +47,7 @@ erDiagram
     varchar url
     int sort_order
     timestamptz created_at
+    timestamptz deleted_at
   }
 
   bids {
@@ -53,6 +56,7 @@ erDiagram
     uuid bidder_id FK
     numeric amount
     timestamptz created_at
+    timestamptz deleted_at
   }
 
   messages {
@@ -61,8 +65,8 @@ erDiagram
     uuid sender_id FK
     uuid recipient_id FK
     text body
-    boolean is_deleted
     timestamptz created_at
+    timestamptz deleted_at
   }
 
   notifications {
@@ -75,6 +79,7 @@ erDiagram
     uuid auction_id FK
     timestamptz read_at
     timestamptz created_at
+    timestamptz deleted_at
   }
 
   disputes {
@@ -90,6 +95,7 @@ erDiagram
     timestamptz resolved_at
     timestamptz created_at
     timestamptz updated_at
+    timestamptz deleted_at
   }
 
   payments {
@@ -98,12 +104,12 @@ erDiagram
     uuid payer_user_id FK
     uuid payee_user_id FK
     numeric amount
-    char currency
+    varchar currency
     payment_status_enum status
     varchar external_reference
-    boolean is_deleted
     timestamptz created_at
     timestamptz updated_at
+    timestamptz deleted_at
   }
 
   users ||--o{ auctions : "seller"

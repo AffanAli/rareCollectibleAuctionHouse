@@ -1,6 +1,7 @@
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -17,18 +18,23 @@ export class Dispute {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Auction, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Auction, { onDelete: 'NO ACTION' })
   @JoinColumn({ name: 'auction_id' })
   auction: Auction;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, { onDelete: 'NO ACTION' })
   @JoinColumn({ name: 'raised_by_user_id' })
   raisedBy: User;
 
   @Column({ type: 'text' })
   description: string;
 
-  @Column({ name: 'evidence_url', type: 'varchar', length: 2048, nullable: true })
+  @Column({
+    name: 'evidence_url',
+    type: 'varchar',
+    length: 2048,
+    nullable: true,
+  })
   evidenceUrl: string | null;
 
   @Column({
@@ -62,4 +68,7 @@ export class Dispute {
 
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
   updatedAt: Date;
+
+  @DeleteDateColumn({ name: 'deleted_at', type: 'timestamptz', nullable: true })
+  deletedAt: Date | null;
 }

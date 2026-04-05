@@ -2,7 +2,7 @@
 
 coursework backend (NestJS on **Express** via `@nestjs/platform-express`). Controllers expose REST-shaped routes; services hold stub logic until persistence and auth are added. This is a structured **module/controller/service** layout (similar to MVC routing + logic layers), not a production deployment.
 
-**Architecture & ERD:** see [docs/architecture-and-data-model.md](docs/architecture-and-data-model.md) (Mermaid entity–relationship diagram, layered architecture, sample request flow).
+**ERD (soft delete + FK policy):** [docs/architecture-and-data-model.md](docs/architecture-and-data-model.md).
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter, extended with domain modules under `src/modules/`.
 
@@ -25,9 +25,9 @@ Frontend (e.g. React) can call this API with **CORS** enabled in `main.ts`. Copy
 
 ### PostgreSQL and TypeORM migrations
 
-- **Entities:** `src/database/entities/` (User, Auction, AuctionImage, Bid, Message, Notification, Dispute, Payment).
+- **Entities:** `src/database/entities/` (User, Auction, AuctionImage, Bid, Message, Notification, Dispute, Payment) — each has **`deleted_at`** for soft delete.
 - **CLI data source:** `src/database/data-source.ts` (used by TypeORM CLI; loads `.env` from the project root).
-- **Initial migration:** `src/database/migrations/1743345600000-initial-schema.ts`.
+- **Migrations:** `1743345600000-initial-schema.ts`, then `1743345700000-soft-delete-and-no-action-fks.ts` (`deleted_at` on all tables, `is_deleted` removed, FK `ON DELETE` aligned with soft delete).
 
 Start PostgreSQL (example with Docker):
 

@@ -1,6 +1,7 @@
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -15,11 +16,13 @@ export class Bid {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => Auction, (auction) => auction.bids, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Auction, (auction) => auction.bids, {
+    onDelete: 'NO ACTION',
+  })
   @JoinColumn({ name: 'auction_id' })
   auction: Auction;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, { onDelete: 'NO ACTION' })
   @JoinColumn({ name: 'bidder_id' })
   bidder: User;
 
@@ -33,4 +36,7 @@ export class Bid {
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
+
+  @DeleteDateColumn({ name: 'deleted_at', type: 'timestamptz', nullable: true })
+  deletedAt: Date | null;
 }

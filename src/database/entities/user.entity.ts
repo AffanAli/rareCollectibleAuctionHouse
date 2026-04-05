@@ -1,6 +1,7 @@
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -26,10 +27,20 @@ export class User {
   })
   role: UserRole;
 
-  @Column({ name: 'display_name', type: 'varchar', length: 255, nullable: true })
+  @Column({
+    name: 'display_name',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
   displayName: string | null;
 
-  @Column({ name: 'contact_phone', type: 'varchar', length: 64, nullable: true })
+  @Column({
+    name: 'contact_phone',
+    type: 'varchar',
+    length: 64,
+    nullable: true,
+  })
   contactPhone: string | null;
 
   @Column({ name: 'preferences_json', type: 'jsonb', nullable: true })
@@ -43,4 +54,7 @@ export class User {
 
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
   updatedAt: Date;
+
+  @DeleteDateColumn({ name: 'deleted_at', type: 'timestamptz', nullable: true })
+  deletedAt: Date | null;
 }

@@ -1,6 +1,7 @@
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -21,11 +22,11 @@ export class Payment {
   @JoinColumn({ name: 'auction_id' })
   auction: Auction | null;
 
-  @ManyToOne(() => User, { onDelete: 'RESTRICT' })
+  @ManyToOne(() => User, { onDelete: 'NO ACTION' })
   @JoinColumn({ name: 'payer_user_id' })
   payer: User;
 
-  @ManyToOne(() => User, { onDelete: 'RESTRICT' })
+  @ManyToOne(() => User, { onDelete: 'NO ACTION' })
   @JoinColumn({ name: 'payee_user_id' })
   payee: User;
 
@@ -48,15 +49,20 @@ export class Payment {
   })
   status: PaymentStatus;
 
-  @Column({ name: 'external_reference', type: 'varchar', length: 255, nullable: true })
+  @Column({
+    name: 'external_reference',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
   externalReference: string | null;
-
-  @Column({ name: 'is_deleted', default: false })
-  isDeleted: boolean;
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
 
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
   updatedAt: Date;
+
+  @DeleteDateColumn({ name: 'deleted_at', type: 'timestamptz', nullable: true })
+  deletedAt: Date | null;
 }
