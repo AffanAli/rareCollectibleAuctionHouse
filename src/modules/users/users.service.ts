@@ -7,11 +7,15 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService extends TypeOrmCrudService<User> {
-  constructor(@InjectRepository(User) repo: Repository<User>) {
+  constructor(@InjectRepository(User) public repo: Repository<User>) {
     super(repo);
   }
 
   getMany(req: CrudRequest) {
     return super.getMany(req);
+  }
+
+  createOne(req: CrudRequest, dto: User) {
+    return super.createOne(req, dto);
   }
 }

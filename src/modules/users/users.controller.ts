@@ -1,8 +1,9 @@
 import * as crud from '@nestjsx/crud';
-import { ApiTags } from '@nestjs/swagger';
-import { Controller } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
+import { Controller, UseGuards } from '@nestjs/common';
 import { User } from 'src/database/entities/user.entity';
+import { JwtAuthGuard } from 'src/modules/utils/guards/jwt-auth.guard';
 import { CreateUserDto, UpdateUserDto } from 'src/modules/users/types/user.dto';
 
 @crud.Crud({
@@ -12,10 +13,17 @@ import { CreateUserDto, UpdateUserDto } from 'src/modules/users/types/user.dto';
     update: UpdateUserDto,
   },
   routes: {
-    exclude: ['replaceOneBase', 'deleteOneBase', 'createManyBase'],
+    exclude: [
+      'createOneBase',
+      'replaceOneBase',
+      'deleteOneBase',
+      'createManyBase',
+    ],
   },
 })
 @ApiTags('Users')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UsersController {
   constructor(public readonly service: UsersService) {}

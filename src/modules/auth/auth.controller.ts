@@ -1,38 +1,21 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LoginDto } from './dto/login.dto';
-import { RegisterDto } from './dto/register.dto';
+import { Controller, Post, Body } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import { LoginDto } from 'src/modules/auth/dto/login.dto';
+import { CreateUserDto } from 'src/modules/users/types/user.dto';
 
 @Controller('auth')
+@ApiTags('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private authService: AuthService) {}
 
-  /**
-   * Smoke test for the auth module.
-   * @returns { { ok: boolean; scope: string } }
-   */
-  @Get('test')
-  getTest(): { ok: boolean; scope: string } {
-    return { ok: true, scope: 'auth' };
-  }
-
-  /**
-   * Register a new account (stub).
-   * @param { RegisterDto } registerDto - Registration body.
-   * @returns { { message: string; userId: string } }
-   */
   @Post('register')
-  register(@Body() registerDto: RegisterDto): { message: string; userId: string } {
-    return this.authService.register(registerDto);
+  register(@Body() dto: CreateUserDto) {
+    return this.authService.register(dto);
   }
 
-  /**
-   * Log in (stub).
-   * @param { LoginDto } loginDto - Login body.
-   * @returns { { message: string; accessToken: string } }
-   */
   @Post('login')
-  login(@Body() loginDto: LoginDto): { message: string; accessToken: string } {
-    return this.authService.login(loginDto);
+  async login(@Body() body: LoginDto) {
+    return this.authService.login(body.email, body.password);
   }
 }
