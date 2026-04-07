@@ -1,44 +1,57 @@
-import { Body, Controller, Get, Patch } from '@nestjs/common';
+import * as crud from '@nestjsx/crud';
+import { ApiTags } from '@nestjs/swagger';
+import { Controller } from '@nestjs/common';
 import { UsersService } from './users.service';
+import { User } from 'src/database/entities/user.entity';
+import { CreateUserDto, UpdateUserDto } from 'src/modules/users/types/user.dto';
 
+@crud.Crud({
+  model: { type: User },
+  dto: {
+    create: CreateUserDto,
+    update: UpdateUserDto,
+  },
+  routes: {
+    exclude: ['replaceOneBase', 'deleteOneBase', 'createManyBase'],
+  },
+})
+@ApiTags('Users')
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(public readonly service: UsersService) {}
 
-  /**
-   * Smoke test for the users module.
-   * @returns { { ok: boolean; scope: string } }
-   */
-  @Get('test')
-  getTest(): { ok: boolean; scope: string } {
-    return { ok: true, scope: 'users' };
+  get base(): crud.CrudController<User> {
+    return this;
   }
 
-  /**
-   * Current user profile (stub).
-   * @returns { Record<string, unknown> }
-   */
-  @Get('me')
-  getMe(): Record<string, unknown> {
-    return this.usersService.getMe();
+  @crud.Override('getManyBase')
+  getMany(@crud.ParsedRequest() req: crud.CrudRequest) {
+    return this.base?.getManyBase?.(req);
   }
 
-  /**
-   * Update current user profile (stub).
-   * @param { Record<string, unknown> } body - Updatable fields.
-   * @returns { Record<string, unknown> }
-   */
-  @Patch('me')
-  updateMe(@Body() body: Record<string, unknown>): Record<string, unknown> {
-    return this.usersService.updateMe(body);
+  @crud.Override('getOneBase')
+  getOne(@crud.ParsedRequest() req: crud.CrudRequest) {
+    return this.base?.getOneBase?.(req);
   }
 
-  /**
-   * Auction history for the current user (stub).
-   * @returns { { items: unknown[] } }
-   */
-  @Get('me/auction-history')
-  getMyAuctionHistory(): { items: unknown[] } {
-    return this.usersService.getMyAuctionHistory();
+  @crud.Override('createOneBase')
+  async createOne(
+    @crud.ParsedRequest() req: crud.CrudRequest,
+    @crud.ParsedBody() dto: CreateUserDto,
+  ) {
+    const hashedPassword = dto.password;
+
+    return this.base?.createOneBase?.(req, {
+      ...dto,
+      passwordHash: hashedPassword,
+    } as unknown as User);
+  }
+
+  @crud.Override('updateOneBase')
+  updateOne(
+    @crud.ParsedRequest() req: crud.CrudRequest,
+    @crud.ParsedBody() dto: UpdateUserDto,
+  ) {
+    return this.base?.updateOneBase?.(req, dto as unknown as User);
   }
 }

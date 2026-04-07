@@ -18,7 +18,7 @@ export class InitialSchema1743345600000 implements MigrationInterface {
 
     await queryRunner.query(`
       CREATE TABLE "users" (
-        "id" uuid NOT NULL DEFAULT gen_random_uuid(),
+        "id" SERIAL PRIMARY KEY,
         "email" character varying NOT NULL,
         "password_hash" character varying NOT NULL,
         "role" "user_role_enum" NOT NULL DEFAULT 'USER',
@@ -28,15 +28,14 @@ export class InitialSchema1743345600000 implements MigrationInterface {
         "is_active" boolean NOT NULL DEFAULT true,
         "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
         "updated_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
-        CONSTRAINT "UQ_users_email" UNIQUE ("email"),
-        CONSTRAINT "PK_users" PRIMARY KEY ("id")
+        CONSTRAINT "UQ_users_email" UNIQUE ("email")
       );
     `);
 
     await queryRunner.query(`
       CREATE TABLE "auctions" (
-        "id" uuid NOT NULL DEFAULT gen_random_uuid(),
-        "seller_id" uuid NOT NULL,
+        "id" SERIAL PRIMARY KEY,
+        "seller_id" integer NOT NULL,
         "title" character varying(500) NOT NULL,
         "description" text NOT NULL,
         "status" "auction_status_enum" NOT NULL DEFAULT 'DRAFT',
@@ -46,31 +45,28 @@ export class InitialSchema1743345600000 implements MigrationInterface {
         "is_deleted" boolean NOT NULL DEFAULT false,
         "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
         "updated_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
-        CONSTRAINT "PK_auctions" PRIMARY KEY ("id"),
         CONSTRAINT "FK_auctions_seller" FOREIGN KEY ("seller_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE
       );
     `);
 
     await queryRunner.query(`
       CREATE TABLE "auction_images" (
-        "id" uuid NOT NULL DEFAULT gen_random_uuid(),
-        "auction_id" uuid NOT NULL,
+        "id" SERIAL PRIMARY KEY,
+        "auction_id" integer NOT NULL,
         "url" character varying(2048) NOT NULL,
         "sort_order" integer NOT NULL DEFAULT 0,
         "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
-        CONSTRAINT "PK_auction_images" PRIMARY KEY ("id"),
         CONSTRAINT "FK_auction_images_auction" FOREIGN KEY ("auction_id") REFERENCES "auctions"("id") ON DELETE CASCADE ON UPDATE CASCADE
       );
     `);
 
     await queryRunner.query(`
       CREATE TABLE "bids" (
-        "id" uuid NOT NULL DEFAULT gen_random_uuid(),
-        "auction_id" uuid NOT NULL,
-        "bidder_id" uuid NOT NULL,
+        "id" SERIAL PRIMARY KEY,
+        "auction_id" integer NOT NULL,
+        "bidder_id" integer NOT NULL,
         "amount" numeric(12,2) NOT NULL,
         "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
-        CONSTRAINT "PK_bids" PRIMARY KEY ("id"),
         CONSTRAINT "FK_bids_auction" FOREIGN KEY ("auction_id") REFERENCES "auctions"("id") ON DELETE CASCADE ON UPDATE CASCADE,
         CONSTRAINT "FK_bids_bidder" FOREIGN KEY ("bidder_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE
       );
@@ -78,8 +74,8 @@ export class InitialSchema1743345600000 implements MigrationInterface {
 
     await queryRunner.query(`
       ALTER TABLE "auctions"
-        ADD "current_high_bid_id" uuid,
-        ADD "winning_bid_id" uuid;
+        ADD "current_high_bid_id" integer,
+        ADD "winning_bid_id" integer;
     `);
 
     await queryRunner.query(`
@@ -90,14 +86,12 @@ export class InitialSchema1743345600000 implements MigrationInterface {
 
     await queryRunner.query(`
       CREATE TABLE "messages" (
-        "id" uuid NOT NULL DEFAULT gen_random_uuid(),
-        "auction_id" uuid NOT NULL,
-        "sender_id" uuid NOT NULL,
-        "recipient_id" uuid,
+        "id" SERIAL PRIMARY KEY,
+        "auction_id" integer NOT NULL,
+        "sender_id" integer NOT NULL,
+        "recipient_id" integer,
         "body" text NOT NULL,
-        "is_deleted" boolean NOT NULL DEFAULT false,
         "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
-        CONSTRAINT "PK_messages" PRIMARY KEY ("id"),
         CONSTRAINT "FK_messages_auction" FOREIGN KEY ("auction_id") REFERENCES "auctions"("id") ON DELETE CASCADE ON UPDATE CASCADE,
         CONSTRAINT "FK_messages_sender" FOREIGN KEY ("sender_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE,
         CONSTRAINT "FK_messages_recipient" FOREIGN KEY ("recipient_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE
@@ -106,16 +100,15 @@ export class InitialSchema1743345600000 implements MigrationInterface {
 
     await queryRunner.query(`
       CREATE TABLE "notifications" (
-        "id" uuid NOT NULL DEFAULT gen_random_uuid(),
-        "user_id" uuid NOT NULL,
+        "id" SERIAL PRIMARY KEY,
+        "user_id" integer NOT NULL,
         "type" character varying(64) NOT NULL,
         "title" character varying(255) NOT NULL,
         "body" text,
         "payload_json" jsonb,
-        "auction_id" uuid,
+        "auction_id" integer,
         "read_at" TIMESTAMPTZ,
         "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
-        CONSTRAINT "PK_notifications" PRIMARY KEY ("id"),
         CONSTRAINT "FK_notifications_user" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE,
         CONSTRAINT "FK_notifications_auction" FOREIGN KEY ("auction_id") REFERENCES "auctions"("id") ON DELETE SET NULL ON UPDATE CASCADE
       );
@@ -123,19 +116,18 @@ export class InitialSchema1743345600000 implements MigrationInterface {
 
     await queryRunner.query(`
       CREATE TABLE "disputes" (
-        "id" uuid NOT NULL DEFAULT gen_random_uuid(),
-        "auction_id" uuid NOT NULL,
-        "raised_by_user_id" uuid NOT NULL,
+        "id" SERIAL PRIMARY KEY,
+        "auction_id" integer NOT NULL,
+        "raised_by_user_id" integer NOT NULL,
         "description" text NOT NULL,
         "evidence_url" character varying(2048),
         "status" "dispute_status_enum" NOT NULL DEFAULT 'OPEN',
         "resolution" "dispute_resolution_enum",
         "resolution_notes" text,
-        "resolved_by_admin_id" uuid,
+        "resolved_by_admin_id" integer,
         "resolved_at" TIMESTAMPTZ,
         "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
         "updated_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
-        CONSTRAINT "PK_disputes" PRIMARY KEY ("id"),
         CONSTRAINT "FK_disputes_auction" FOREIGN KEY ("auction_id") REFERENCES "auctions"("id") ON DELETE CASCADE ON UPDATE CASCADE,
         CONSTRAINT "FK_disputes_raised_by" FOREIGN KEY ("raised_by_user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE,
         CONSTRAINT "FK_disputes_resolved_by" FOREIGN KEY ("resolved_by_admin_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE
@@ -144,10 +136,10 @@ export class InitialSchema1743345600000 implements MigrationInterface {
 
     await queryRunner.query(`
       CREATE TABLE "payments" (
-        "id" uuid NOT NULL DEFAULT gen_random_uuid(),
-        "auction_id" uuid,
-        "payer_user_id" uuid NOT NULL,
-        "payee_user_id" uuid NOT NULL,
+        "id" SERIAL PRIMARY KEY,
+        "auction_id" integer,
+        "payer_user_id" integer NOT NULL,
+        "payee_user_id" integer NOT NULL,
         "amount" numeric(12,2) NOT NULL,
         "currency" character(3) NOT NULL DEFAULT 'GBP',
         "status" "payment_status_enum" NOT NULL DEFAULT 'PENDING',
@@ -155,7 +147,6 @@ export class InitialSchema1743345600000 implements MigrationInterface {
         "is_deleted" boolean NOT NULL DEFAULT false,
         "created_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
         "updated_at" TIMESTAMPTZ NOT NULL DEFAULT now(),
-        CONSTRAINT "PK_payments" PRIMARY KEY ("id"),
         CONSTRAINT "FK_payments_auction" FOREIGN KEY ("auction_id") REFERENCES "auctions"("id") ON DELETE SET NULL ON UPDATE CASCADE,
         CONSTRAINT "FK_payments_payer" FOREIGN KEY ("payer_user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE,
         CONSTRAINT "FK_payments_payee" FOREIGN KEY ("payee_user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE

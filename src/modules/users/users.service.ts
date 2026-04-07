@@ -1,29 +1,17 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { CrudRequest } from '@nestjsx/crud';
+import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
+import { User } from 'src/database/entities/user.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
-export class UsersService {
-  /**
-   * Stub: return the current user profile.
-   * @returns { Record<string, unknown> }
-   */
-  getMe(): Record<string, unknown> {
-    return { message: 'TODO: load user from auth context', profile: {} };
+export class UsersService extends TypeOrmCrudService<User> {
+  constructor(@InjectRepository(User) repo: Repository<User>) {
+    super(repo);
   }
 
-  /**
-   * Stub: update profile fields.
-   * @param { Record<string, unknown> } body - Patch payload.
-   * @returns { Record<string, unknown> }
-   */
-  updateMe(body: Record<string, unknown>): Record<string, unknown> {
-    return { message: 'TODO: persist profile', received: body };
-  }
-
-  /**
-   * Stub: auction history for the current user.
-   * @returns { { items: unknown[] } }
-   */
-  getMyAuctionHistory(): { items: unknown[] } {
-    return { items: [] };
+  getMany(req: CrudRequest) {
+    return super.getMany(req);
   }
 }

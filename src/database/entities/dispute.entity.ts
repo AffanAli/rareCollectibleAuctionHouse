@@ -15,8 +15,8 @@ import { User } from './user.entity';
 
 @Entity('disputes')
 export class Dispute {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @ManyToOne(() => Auction, { onDelete: 'NO ACTION' })
   @JoinColumn({ name: 'auction_id' })

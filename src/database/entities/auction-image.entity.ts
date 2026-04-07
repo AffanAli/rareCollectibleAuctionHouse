@@ -11,8 +11,8 @@ import { Auction } from './auction.entity';
 
 @Entity('auction_images')
 export class AuctionImage {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @ManyToOne(() => Auction, (auction) => auction.images, {
     onDelete: 'NO ACTION',

@@ -12,8 +12,8 @@ import { User } from './user.entity';
 
 @Entity('notifications')
 export class Notification {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @ManyToOne(() => User, { onDelete: 'NO ACTION' })
   @JoinColumn({ name: 'user_id' })

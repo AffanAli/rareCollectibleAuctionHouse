@@ -13,8 +13,8 @@ import { User } from './user.entity';
 
 @Entity('bids')
 export class Bid {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @ManyToOne(() => Auction, (auction) => auction.bids, {
     onDelete: 'NO ACTION',
