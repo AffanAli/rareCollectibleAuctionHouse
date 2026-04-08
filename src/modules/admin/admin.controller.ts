@@ -3,10 +3,14 @@ import { AdminService } from './admin.service';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/modules/utils/guards/jwt-auth.guard';
 import { User } from 'src/database/entities';
+import { RolesGuard } from 'src/modules/utils/guards/roles.guard';
+import { UserRole } from 'src/database/enums/user-role.enum';
+import { Roles } from 'src/modules/utils/decorators/roles.decorator';
 
 @Controller('admin')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(UserRole.Admin)
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 

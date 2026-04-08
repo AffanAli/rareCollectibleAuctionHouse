@@ -9,6 +9,9 @@ import {
   CreateAuctionDto,
   UpdateAuctionDto,
 } from 'src/modules/auctions/dto/create-auction.dto';
+import { UserRole } from 'src/database/enums/user-role.enum';
+import { Roles } from 'src/modules/utils/decorators/roles.decorator';
+import { RolesGuard } from 'src/modules/utils/guards/roles.guard';
 
 @crud.Crud({
   model: { type: Auction },
@@ -18,7 +21,8 @@ import {
 })
 @ApiTags('Auctions')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(UserRole.Admin)
 @Controller('auctions')
 export class AuctionsController {
   constructor(public readonly service: AuctionsService) {}

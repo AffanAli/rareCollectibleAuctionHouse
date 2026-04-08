@@ -5,6 +5,9 @@ import { Controller, UseGuards } from '@nestjs/common';
 import { User } from 'src/database/entities/user.entity';
 import { JwtAuthGuard } from 'src/modules/utils/guards/jwt-auth.guard';
 import { CreateUserDto, UpdateUserDto } from 'src/modules/users/types/user.dto';
+import { UserRole } from 'src/database/enums/user-role.enum';
+import { Roles } from 'src/modules/utils/decorators/roles.decorator';
+import { RolesGuard } from 'src/modules/utils/guards/roles.guard';
 
 @crud.Crud({
   model: { type: User },
@@ -24,7 +27,8 @@ import { CreateUserDto, UpdateUserDto } from 'src/modules/users/types/user.dto';
 })
 @ApiTags('Users')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(UserRole.User, UserRole.Admin)
 @Controller('users')
 export class UsersController {
   constructor(public readonly service: UsersService) {}
