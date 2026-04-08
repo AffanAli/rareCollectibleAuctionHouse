@@ -18,6 +18,7 @@ import { CreateUserDto, UpdateUserDto } from 'src/modules/users/types/user.dto';
       'replaceOneBase',
       'deleteOneBase',
       'createManyBase',
+      'getManyBase',
     ],
   },
 })
@@ -30,11 +31,6 @@ export class UsersController {
 
   get base(): crud.CrudController<User> {
     return this;
-  }
-
-  @crud.Override('getManyBase')
-  getMany(@crud.ParsedRequest() req: crud.CrudRequest) {
-    return this.base?.getManyBase?.(req);
   }
 
   @crud.Override('getOneBase')

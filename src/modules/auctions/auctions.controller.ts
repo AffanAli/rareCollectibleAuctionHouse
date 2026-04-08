@@ -1,46 +1,50 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { AuctionsService } from './auctions.service';
-import { CreateAuctionDto } from './dto/create-auction.dto';
+import * as crud from '@nestjsx/crud';
+import { Auction } from 'src/database/entities';
 
+import { AuctionsService } from './auctions.service';
+import { Controller, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/modules/utils/guards/jwt-auth.guard';
+import {
+  CreateAuctionDto,
+  UpdateAuctionDto,
+} from 'src/modules/auctions/dto/create-auction.dto';
+
+@crud.Crud({
+  model: { type: Auction },
+  routes: {
+    exclude: ['replaceOneBase', 'deleteOneBase', 'createManyBase'],
+  },
+})
+@ApiTags('Auctions')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('auctions')
 export class AuctionsController {
-  constructor(private readonly auctionsService: AuctionsService) {}
+  constructor(public readonly service: AuctionsService) {}
 
-  /**
-   * Smoke test for the auctions module.
-   * @returns { { ok: boolean; scope: string } }
-   */
-  @Get('test')
-  getTest(): { ok: boolean; scope: string } {
-    return { ok: true, scope: 'auctions' };
+  get base(): crud.CrudController<Auction> {
+    return this;
   }
 
-  /**
-   * List available auctions (stub).
-   * @returns { { items: unknown[] } }
-   */
-  @Get()
-  findAll(): { items: unknown[] } {
-    return this.auctionsService.findAll();
+  @crud.Override('getOneBase')
+  getOne(@crud.ParsedRequest() req: crud.CrudRequest) {
+    return this.base?.getOneBase?.(req);
   }
 
-  /**
-   * Create a new auction (stub).
-   * @param { CreateAuctionDto } dto - Body.
-   * @returns { { message: string; id: string } }
-   */
-  @Post()
-  create(@Body() dto: CreateAuctionDto): { message: string; id: string } {
-    return this.auctionsService.create(dto);
+  @crud.Override('createOneBase')
+  async createOne(
+    @crud.ParsedRequest() req: crud.CrudRequest,
+    @crud.ParsedBody() dto: CreateAuctionDto,
+  ) {
+    return this.base?.createOneBase?.(req, dto as unknown as Auction);
   }
 
-  /**
-   * Auction details (stub). Dynamic route last among GETs for this controller.
-   * @param { string } id - Auction id.
-   * @returns { Record<string, unknown> }
-   */
-  @Get(':id')
-  findOne(@Param('id') id: string): Record<string, unknown> {
-    return this.auctionsService.findOne(id);
+  @crud.Override('updateOneBase')
+  updateOne(
+    @crud.ParsedRequest() req: crud.CrudRequest,
+    @crud.ParsedBody() dto: UpdateAuctionDto,
+  ) {
+    return this.base?.updateOneBase?.(req, dto as unknown as Auction);
   }
 }

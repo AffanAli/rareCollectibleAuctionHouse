@@ -11,10 +11,6 @@ export class UsersService extends TypeOrmCrudService<User> {
     super(repo);
   }
 
-  getMany(req: CrudRequest) {
-    return super.getMany(req);
-  }
-
   createOne(req: CrudRequest, dto: User) {
     return super.createOne(req, dto);
   }
