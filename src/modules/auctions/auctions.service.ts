@@ -13,7 +13,7 @@ import {
   AuctionListQueryDto,
   CreateAuctionDto,
   UpdateAuctionDto,
-} from './dto/create-auction.dto';
+} from './types/create-auction.dto';
 
 type AuctionResponse = {
   id: number;
