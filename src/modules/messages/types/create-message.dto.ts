@@ -1,15 +1,12 @@
-import { IsOptional, IsString, MinLength } from 'class-validator';
+import { IsNumber, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class CreateMessageDto {
-  @IsString()
-  @MinLength(1)
-  auctionId: string;
-
-  @IsString()
-  @MinLength(1)
-  body: string;
-
   @IsOptional()
+  @IsNumber()
+  recipientId?: number;
+
   @IsString()
-  recipientUserId?: string;
+  @MinLength(1)
+  @MaxLength(4000)
+  body: string;
 }

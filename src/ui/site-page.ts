@@ -4,6 +4,7 @@ export type SitePagePath =
   | '/register'
   | '/marketplace'
   | '/bids'
+  | '/messages'
   | '/profile'
   | '/seller/auctions'
   | '/seller/auctions/new';
@@ -751,6 +752,7 @@ export function renderSitePage({
           <a class="nav-link${activePath === '/marketplace' ? ' active' : ''}" href="/marketplace">Marketplace</a>
           <a class="nav-link${activePath === '/profile' ? ' active' : ''}" href="/profile">Profile</a>
           <a class="nav-link${activePath === '/bids' ? ' active' : ''}" href="/bids">My bids</a>
+          <a class="nav-link${activePath === '/messages' ? ' active' : ''}" href="/messages">Messages</a>
           <a class="nav-link${activePath === '/seller/auctions' || activePath === '/seller/auctions/new' ? ' active' : ''}" href="/seller/auctions">Sell</a>
           <a class="nav-link guest-only${activePath === '/login' ? ' active' : ''}" href="/login">Login</a>
           <a class="nav-link guest-only${activePath === '/register' ? ' active' : ''}" href="/register">Register</a>
@@ -776,6 +778,7 @@ export function renderSitePage({
               <div class="dropdown-items" role="menu" aria-label="Account menu">
                 <a class="dropdown-item" href="/profile" role="menuitem">Profile</a>
                 <a class="dropdown-item" href="/bids" role="menuitem">My bids</a>
+                <a class="dropdown-item" href="/messages" role="menuitem">Messages</a>
                 <a class="dropdown-item" href="/seller/auctions" role="menuitem">My auctions</a>
                 <button class="dropdown-item" id="logout-button" type="button" role="menuitem">Log out</button>
               </div>

@@ -221,6 +221,24 @@ export class AuctionsUiService {
               </form>
               <div id="bid-status" class="status" aria-live="polite"></div>
             </section>
+            <section class="info-card" style="margin-top: 22px;">
+              <div class="kicker">Messaging</div>
+              <h3 style="margin-top: 10px;">Contact the seller</h3>
+              <p class="muted" id="message-summary" style="margin-top: 10px;">
+                Ask questions about provenance, shipping, or item condition before you bid.
+              </p>
+              <form id="message-form" style="margin-top: 18px;">
+                <label>
+                  Your message
+                  <textarea name="body" placeholder="Hi, could you confirm the item's condition and shipping details?"></textarea>
+                </label>
+                <div class="toolbar">
+                  <button class="button-primary" type="submit">Send to seller</button>
+                  <a class="button button-secondary" href="/messages">Open inbox</a>
+                </div>
+              </form>
+              <div id="message-status" class="status" aria-live="polite"></div>
+            </section>
             <div class="hero-actions" style="margin-top: 24px;">
               <a class="button button-secondary" href="/marketplace">Back to marketplace</a>
               <a class="button button-primary" href="/bids">Track my bids</a>
@@ -286,6 +304,8 @@ export class AuctionsUiService {
         const biddingSummary = document.getElementById('bidding-summary');
         const bidForm = document.getElementById('bid-form');
         const bidStatus = document.getElementById('bid-status');
+        const messageForm = document.getElementById('message-form');
+        const messageStatus = document.getElementById('message-status');
         const errorBox = document.getElementById('auction-error');
 
         const formatMoney = (value) =>
@@ -296,6 +316,11 @@ export class AuctionsUiService {
         const setBidStatus = (message, type = 'success') => {
           bidStatus.className = \`status \${type} visible\`;
           bidStatus.textContent = message;
+        };
+
+        const setMessageStatus = (message, type = 'success') => {
+          messageStatus.className = \`status \${type} visible\`;
+          messageStatus.textContent = message;
         };
 
         async function loadBidHistory() {
@@ -413,6 +438,38 @@ export class AuctionsUiService {
             await loadBidHistory();
           } catch (error) {
             setBidStatus(error instanceof Error ? error.message : 'Something went wrong.', 'error');
+          }
+        });
+
+        messageForm.addEventListener('submit', async (event) => {
+          event.preventDefault();
+
+          if (!token) {
+            setMessageStatus('Please log in before messaging the seller.', 'error');
+            return;
+          }
+
+          try {
+            const response = await fetch(\`/auctions/\${auctionId}/messages\`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + token,
+              },
+              body: JSON.stringify({
+                body: messageForm.body.value,
+              }),
+            });
+            const result = await response.json().catch(() => null);
+
+            if (!response.ok) {
+              throw new Error(result?.message || 'Unable to send message.');
+            }
+
+            setMessageStatus('Message sent successfully.');
+            messageForm.reset();
+          } catch (error) {
+            setMessageStatus(error instanceof Error ? error.message : 'Something went wrong.', 'error');
           }
         });
 
