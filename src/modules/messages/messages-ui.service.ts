@@ -88,6 +88,9 @@ export class MessagesUiService {
         const threadForm = document.getElementById('thread-form');
 
         let currentConversation = null;
+        let currentInboxSnapshot = '';
+        let currentThreadSnapshot = '';
+        let pollingHandle = null;
 
         const formatDate = (value) =>
           new Intl.DateTimeFormat('en-GB', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
@@ -108,9 +111,28 @@ export class MessagesUiService {
           return data;
         };
 
+        const buildInboxSnapshot = (conversations) =>
+          JSON.stringify(
+            (conversations || []).map((conversation) => ({
+              auctionId: conversation.auction.id,
+              counterpartId: conversation.counterpart.id,
+              lastMessageId: conversation.lastMessage.id,
+              lastMessageAt: conversation.lastMessage.createdAt,
+            })),
+          );
+
+        const buildThreadSnapshot = (messages) =>
+          JSON.stringify(
+            (messages || []).map((message) => ({
+              id: message.id,
+              createdAt: message.createdAt,
+            })),
+          );
+
         async function loadThread(conversation) {
           currentConversation = conversation;
           const messages = await api(\`/auctions/\${conversation.auction.id}/messages?counterpartUserId=\${conversation.counterpart.id}\`);
+          currentThreadSnapshot = buildThreadSnapshot(messages);
           threadTitle.textContent = conversation.auction.title;
           threadSubtitle.textContent = \`Conversation with \${conversation.counterpart.displayName}\`;
           threadForm.style.display = 'grid';
@@ -129,6 +151,7 @@ export class MessagesUiService {
 
         async function loadInbox() {
           const conversations = await api('/messages/inbox');
+          currentInboxSnapshot = buildInboxSnapshot(conversations);
           summary.textContent = \`\${conversations.length} conversation\${conversations.length === 1 ? '' : 's'}\`;
           list.innerHTML = conversations.length
             ? conversations.map((conversation, index) => \`
@@ -154,6 +177,87 @@ export class MessagesUiService {
           if (conversations[0]) {
             await loadThread(conversations[0]);
           }
+        }
+
+        async function pollMessages() {
+          if (document.hidden) {
+            return;
+          }
+
+          try {
+            const conversations = await api('/messages/inbox');
+            const nextInboxSnapshot = buildInboxSnapshot(conversations);
+
+            if (nextInboxSnapshot !== currentInboxSnapshot) {
+              currentInboxSnapshot = nextInboxSnapshot;
+              summary.textContent = \`\${conversations.length} conversation\${conversations.length === 1 ? '' : 's'}\`;
+              list.innerHTML = conversations.length
+                ? conversations.map((conversation, index) => \`
+                    <button class="dropdown-item" type="button" data-index="\${index}">
+                      <span>
+                        <strong>\${conversation.auction.title}</strong><br />
+                        <span class="dropdown-subtle">\${conversation.counterpart.displayName}</span>
+                      </span>
+                      <span class="dropdown-subtle">\${formatDate(conversation.lastMessage.createdAt)}</span>
+                    </button>
+                  \`).join('')
+                : '<div class="empty-state"><p class="muted">No conversations yet. Start from an auction page.</p></div>';
+
+              list.querySelectorAll('button[data-index]').forEach((button) => {
+                button.addEventListener('click', () => {
+                  loadThread(conversations[Number(button.dataset.index)]).catch((error) => {
+                    statusBox.className = 'status error visible';
+                    statusBox.textContent = error instanceof Error ? error.message : 'Unable to load thread.';
+                  });
+                });
+              });
+            }
+
+            if (currentConversation) {
+              const matchingConversation = conversations.find(
+                (conversation) =>
+                  conversation.auction.id === currentConversation.auction.id &&
+                  conversation.counterpart.id === currentConversation.counterpart.id,
+              );
+
+              if (matchingConversation) {
+                const messages = await api(
+                  \`/auctions/\${matchingConversation.auction.id}/messages?counterpartUserId=\${matchingConversation.counterpart.id}\`,
+                );
+                const nextThreadSnapshot = buildThreadSnapshot(messages);
+
+                if (nextThreadSnapshot !== currentThreadSnapshot) {
+                  currentThreadSnapshot = nextThreadSnapshot;
+                  currentConversation = matchingConversation;
+                  threadTitle.textContent = matchingConversation.auction.title;
+                  threadSubtitle.textContent = \`Conversation with \${matchingConversation.counterpart.displayName}\`;
+                  threadMessages.innerHTML = messages.length
+                    ? messages.map((message) => \`
+                        <article class="info-card">
+                          <div class="meta">
+                            <strong>\${message.sender.displayName}</strong>
+                            <span>\${formatDate(message.createdAt)}</span>
+                          </div>
+                          <p style="margin-top: 10px;">\${message.body}</p>
+                        </article>
+                      \`).join('')
+                    : '<div class="empty-state"><p class="muted">No messages yet.</p></div>';
+                }
+              }
+            }
+          } catch {
+            // Keep polling silent to avoid interrupting the user with transient refresh errors.
+          }
+        }
+
+        function startPolling() {
+          if (pollingHandle) {
+            window.clearInterval(pollingHandle);
+          }
+
+          pollingHandle = window.setInterval(() => {
+            pollMessages();
+          }, 8000);
         }
 
         threadForm.addEventListener('submit', async (event) => {
@@ -184,7 +288,20 @@ export class MessagesUiService {
             statusBox.className = 'status error visible';
             statusBox.textContent = error instanceof Error ? error.message : 'Unable to load inbox.';
           });
+          startPolling();
         }
+
+        document.addEventListener('visibilitychange', () => {
+          if (!document.hidden) {
+            pollMessages();
+          }
+        });
+
+        window.addEventListener('beforeunload', () => {
+          if (pollingHandle) {
+            window.clearInterval(pollingHandle);
+          }
+        });
       </script>`,
     });
   }
