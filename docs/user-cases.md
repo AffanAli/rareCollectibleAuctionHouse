@@ -1,44 +1,19 @@
-1. User registration
-   As a visitor, I want to register on the platform with my email and secure credentials so that I can create an account and participate in auctions as a buyer or seller.
+# Use Cases - Rare Collectible Auction House
 
-2. User login
-   As a registered user, I want to log in to the platform so that I can access my profile, place bids, manage my auctions, and view my notifications and messages.
-
-3. View available auctions
-   As a logged-in user, I want to view a list of available auctions so that I can discover collectibles I am interested in and decide where to bid.
-
-4. View auction details
-   As a guest / visitor, I want to view full details of an auction (item description, current bid, end time, seller info) so that I can make an informed decision before placing a bid.
-
-5. Place a bid on an auction
-   As an authorized user, I want to place a bid on an auction so that I can compete to win the collectible and have my bid recorded fairly.
-
-6. View my bids
-   As an authorized user, I want to view all my bids across auctions so that I can track my activity and see which items I am currently winning or have lost.
-
-7. View my profile
-   As an authorized user, I want to view and manage my profile (contact details, preferences) so that my identity and settings are correct for other users and for the platform.
-
-8. View my auction history
-   As an authorized user, I want to view my auction history (items won, sold, or lost) so that I can review my past activity and outcomes.
-
-9. View auction notifications
-   As an authorized user, I want to view my auction-related notifications (e.g. outbid, auction won, auction ended) so that I stay informed without having to check each auction manually.
-
-10. View and send auction messages
-    As an authorized user, I want to view and send messages related to my auctions (e.g. with buyers/sellers) so that I can communicate about delivery, condition, or payment.
-
-11. Raise a dispute
-    As an authorized user, I want to raise a dispute when an auction or transaction is not going as expected so that the platform or admin can help resolve the issue fairly.
-
-12. Admin login and view platform data
-    As an administrator, I want to log in and view all users, auctions, bids, messages, notifications, disputes, and payments so that I can monitor platform health and enforce policies.
-
-13. Resolve disputes
-    As an administrator, I want to review and resolve user disputes so that conflicts are handled fairly and trust in the platform is maintained.
-
-14. Remove content and users for moderation and compliance
-    As an administrator, I want to delete inappropriate or policy-breaking auctions, users, bids, messages, notifications, or payments so that the platform remains safe and compliant.
-
-15. View all payments
-    As an administrator, I want to view all payment records so that I can support financial oversight, refunds, and dispute resolution.
+| ID  | Title                   | Actor           | Description                                                                                             |
+| --- | ----------------------- | --------------- | ------------------------------------------------------------------------------------------------------- |
+| 1   | User Registration       | Visitor         | Register with email and secure credentials to create an account and participate in auctions.            |
+| 2   | User Login              | Registered User | Log in to access profile, place bids, manage auctions, and view notifications/messages.                 |
+| 3   | View My Profile         | Authorized User | View and manage personal profile details such as contact info and preferences.                          |
+| 4   | Admin Login & Dashboard | Administrator   | Log in and view all platform data (users, auctions, bids, messages, notifications, disputes, payments). |
+| 5   | View Available Auctions | Logged-in User  | Browse a list of available auctions to discover collectibles.                                           |
+| 6   | View Auction Details    | Guest / Visitor | View full auction details including description, bids, end time, and seller info.                       |
+| 7   | View Auction History    | Authorized User | View past auctions (won, sold, lost) for activity tracking.                                             |
+| 8   | Place a Bid             | Authorized User | Place bids on auctions to compete for collectibles.                                                     |
+| 9   | View My Bids            | Authorized User | View all bids across auctions to track current and past bidding activity.                               |
+| 10  | View Notifications      | Authorized User | View auction-related notifications like outbid alerts or auction results.                               |
+| 11  | Messages                | Authorized User | Send and receive messages related to auctions (buyers/sellers communication).                           |
+| 12  | Raise a Dispute         | Authorized User | Raise disputes for issues in auctions or transactions.                                                  |
+| 13  | Resolve Disputes        | Administrator   | Review and resolve disputes to ensure fairness and trust.                                               |
+| 14  | Moderation              | Administrator   | Remove inappropriate users or content to maintain compliance and safety.                                |
+| 15  | View Payments           | Administrator   | View all payment records for financial tracking and dispute handling.                                   |

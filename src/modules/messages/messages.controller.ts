@@ -1,36 +1,38 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
-import { CreateMessageDto } from './dto/create-message.dto';
+import * as crud from '@nestjsx/crud';
+import { Message } from 'src/database/entities';
 import { MessagesService } from './messages.service';
+import { Controller, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { UserRole } from 'src/database/enums/user-role.enum';
+import { RolesGuard } from 'src/modules/utils/guards/roles.guard';
+import { Roles } from 'src/modules/utils/decorators/roles.decorator';
+import { JwtAuthGuard } from 'src/modules/utils/guards/jwt-auth.guard';
 
+@crud.Crud({
+  model: { type: Message },
+  routes: {
+    only: ['getManyBase', 'getOneBase'],
+  },
+})
+@ApiTags('Messages')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(UserRole.Admin, UserRole.User)
 @Controller('messages')
 export class MessagesController {
-  constructor(private readonly messagesService: MessagesService) {}
+  constructor(public readonly service: MessagesService) {}
 
-  /**
-   * Smoke test for the messages module.
-   * @returns { { ok: boolean; scope: string } }
-   */
-  @Get('test')
-  getTest(): { ok: boolean; scope: string } {
-    return { ok: true, scope: 'messages' };
+  get base(): crud.CrudController<Message> {
+    return this;
   }
 
-  /**
-   * List current user's messages / threads (stub).
-   * @returns { { items: unknown[] } }
-   */
-  @Get()
-  findMine(): { items: unknown[] } {
-    return this.messagesService.findMine();
+  @crud.Override('getOneBase')
+  getOne(@crud.ParsedRequest() req: crud.CrudRequest) {
+    return this.base?.getOneBase?.(req);
   }
 
-  /**
-   * Send a message (stub).
-   * @param { CreateMessageDto } dto - Body.
-   * @returns { { message: string; id: string } }
-   */
-  @Post()
-  create(@Body() dto: CreateMessageDto): { message: string; id: string } {
-    return this.messagesService.create(dto);
+  @crud.Override('getManyBase')
+  getMany(@crud.ParsedRequest() req: crud.CrudRequest) {
+    return this.base?.getManyBase?.(req);
   }
 }

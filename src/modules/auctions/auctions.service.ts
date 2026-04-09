@@ -340,4 +340,11 @@ export class AuctionsService {
         })),
     };
   }
+
+  // getOne(req: CrudRequest) {
+  //   return this.repo.findOne({
+  //     where: { id: req.parsed.paramsFilter[0].value },
+  //     relations: ['seller', 'images', 'bids'],
+  //   });
+  // }
 }

@@ -1,22 +1,12 @@
+import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
-import { CreateMessageDto } from './dto/create-message.dto';
+import { Message } from 'src/database/entities';
+import { InjectRepository } from '@nestjs/typeorm';
+import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 
 @Injectable()
-export class MessagesService {
-  /**
-   * Stub: threads visible to the current user.
-   * @returns { { items: unknown[] } }
-   */
-  findMine(): { items: unknown[] } {
-    return { items: [] };
-  }
-
-  /**
-   * Stub: send a message tied to an auction.
-   * @param { CreateMessageDto } dto - Message payload.
-   * @returns { { message: string; id: string } }
-   */
-  create(dto: CreateMessageDto): { message: string; id: string } {
-    return { message: 'TODO: persist message', id: 'stub-message-id' };
+export class MessagesService extends TypeOrmCrudService<Message> {
+  constructor(@InjectRepository(Message) public repo: Repository<Message>) {
+    super(repo);
   }
 }
