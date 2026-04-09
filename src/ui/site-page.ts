@@ -129,6 +129,7 @@ export function renderSitePage({
 
       .nav-links,
       .nav-actions,
+      .account-menu,
       .hero-actions,
       .toolbar,
       .pill-row {
@@ -203,6 +204,124 @@ export function renderSitePage({
         border-color: rgba(31, 111, 120, 0.12);
         color: var(--highlight);
         background: rgba(245, 251, 251, 0.9);
+      }
+
+      .account-menu {
+        position: relative;
+        justify-content: flex-end;
+      }
+
+      .account-trigger {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        min-height: 48px;
+        padding: 6px 10px 6px 6px;
+        border-radius: 999px;
+        border: 1px solid rgba(159, 79, 47, 0.14);
+        background: rgba(255, 252, 247, 0.92);
+        box-shadow: 0 10px 28px rgba(57, 37, 19, 0.08);
+      }
+
+      .account-trigger:hover,
+      .account-trigger:focus-visible,
+      .account-trigger.open {
+        background: rgba(255, 248, 239, 0.98);
+        border-color: rgba(159, 79, 47, 0.24);
+      }
+
+      .account-avatar {
+        display: inline-grid;
+        place-items: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 999px;
+        color: #fff8f2;
+        background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+
+      .account-text {
+        display: grid;
+        gap: 2px;
+        text-align: left;
+      }
+
+      .account-label {
+        color: var(--text);
+        font-size: 0.95rem;
+        font-weight: 700;
+        line-height: 1.1;
+      }
+
+      .account-subtle {
+        color: var(--muted);
+        font-size: 0.78rem;
+        line-height: 1.1;
+      }
+
+      .account-caret {
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      .account-dropdown {
+        position: absolute;
+        top: calc(100% + 12px);
+        right: 0;
+        min-width: 240px;
+        padding: 10px;
+        border-radius: 20px;
+        border: 1px solid rgba(92, 70, 44, 0.14);
+        background: rgba(255, 252, 247, 0.98);
+        backdrop-filter: blur(18px);
+        box-shadow: 0 20px 44px rgba(57, 37, 19, 0.18);
+      }
+
+      .account-dropdown[hidden] {
+        display: none;
+      }
+
+      .account-dropdown-header {
+        padding: 10px 12px 12px;
+        border-bottom: 1px solid rgba(95, 108, 123, 0.1);
+      }
+
+      .dropdown-label {
+        display: block;
+        font-weight: 700;
+        color: var(--text);
+      }
+
+      .dropdown-subtle {
+        display: block;
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 0.85rem;
+        line-height: 1.4;
+      }
+
+      .dropdown-items {
+        display: grid;
+        gap: 4px;
+        padding-top: 8px;
+      }
+
+      .dropdown-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 44px;
+        padding: 0 12px;
+        border-radius: 14px;
+        color: var(--text);
+      }
+
+      .dropdown-item:hover,
+      .dropdown-item:focus-visible {
+        background: rgba(159, 79, 47, 0.08);
+        outline: none;
       }
 
       .hero,
@@ -631,17 +750,168 @@ export function renderSitePage({
           <a class="nav-link${activePath === '/marketplace' ? ' active' : ''}" href="/marketplace">Marketplace</a>
           <a class="nav-link${activePath === '/profile' ? ' active' : ''}" href="/profile">Profile</a>
           <a class="nav-link${activePath === '/seller/auctions' || activePath === '/seller/auctions/new' ? ' active' : ''}" href="/seller/auctions">Sell</a>
-          <a class="nav-link${activePath === '/login' ? ' active' : ''}" href="/login">Login</a>
-          <a class="nav-link${activePath === '/register' ? ' active' : ''}" href="/register">Register</a>
+          <a class="nav-link guest-only${activePath === '/login' ? ' active' : ''}" href="/login">Login</a>
+          <a class="nav-link guest-only${activePath === '/register' ? ' active' : ''}" href="/register">Register</a>
           <a class="nav-link" href="/api">API Docs</a>
         </div>
-        <div class="nav-actions">
-          <a class="button button-secondary" href="/marketplace">Browse auctions</a>
-          <a class="button button-primary" href="/seller/auctions">Manage listings</a>
+        <div class="nav-actions" id="nav-actions">
+          <a class="button button-secondary guest-only" href="/marketplace">Browse auctions</a>
+          <a class="button button-primary guest-only" href="/register">Create account</a>
+          <div class="account-menu user-only" id="account-menu" style="display: none;">
+            <button class="account-trigger" id="account-trigger" type="button" aria-haspopup="menu" aria-expanded="false">
+              <span class="account-avatar" id="nav-avatar">RC</span>
+              <span class="account-text">
+                <span class="account-label" id="nav-account-name">My account</span>
+                <span class="account-subtle" id="nav-account-subtle">Profile and settings</span>
+              </span>
+              <span class="account-caret">▾</span>
+            </button>
+            <div class="account-dropdown" id="account-dropdown" hidden>
+              <div class="account-dropdown-header">
+                <span class="dropdown-label" id="dropdown-name">My account</span>
+                <span class="dropdown-subtle" id="dropdown-email">Profile and settings</span>
+              </div>
+              <div class="dropdown-items" role="menu" aria-label="Account menu">
+                <a class="dropdown-item" href="/profile" role="menuitem">Profile</a>
+                <a class="dropdown-item" href="/seller/auctions" role="menuitem">My auctions</a>
+                <button class="dropdown-item" id="logout-button" type="button" role="menuitem">Log out</button>
+              </div>
+            </div>
+          </div>
         </div>
       </nav>
     </div>
     ${body}
+    <script>
+      (() => {
+        const token = localStorage.getItem('auctionHouseToken');
+        const guestOnly = document.querySelectorAll('.guest-only');
+        const userOnly = document.querySelectorAll('.user-only');
+        const logoutButton = document.getElementById('logout-button');
+        const accountTrigger = document.getElementById('account-trigger');
+        const accountDropdown = document.getElementById('account-dropdown');
+        const avatar = document.getElementById('nav-avatar');
+        const accountName = document.getElementById('nav-account-name');
+        const accountSubtle = document.getElementById('nav-account-subtle');
+        const dropdownName = document.getElementById('dropdown-name');
+        const dropdownEmail = document.getElementById('dropdown-email');
+
+        const setLoggedOutNav = () => {
+          guestOnly.forEach((element) => {
+            element.style.display = '';
+          });
+          userOnly.forEach((element) => {
+            element.style.display = 'none';
+          });
+        };
+
+        const setLoggedInNav = (label = 'My account') => {
+          guestOnly.forEach((element) => {
+            element.style.display = 'none';
+          });
+          userOnly.forEach((element) => {
+            element.style.display = '';
+          });
+
+          const trimmed = String(label || 'My account').trim();
+          const initials = trimmed
+            .split(/\\s+/)
+            .slice(0, 2)
+            .map((part) => part[0]?.toUpperCase() || '')
+            .join('') || 'ME';
+
+          if (accountName) {
+            accountName.textContent = trimmed;
+          }
+          if (dropdownName) {
+            dropdownName.textContent = trimmed;
+          }
+          if (avatar) {
+            avatar.textContent = initials;
+          }
+        };
+
+        if (!token) {
+          setLoggedOutNav();
+        } else {
+          setLoggedInNav();
+          fetch('/users/me', {
+            headers: {
+              Authorization: 'Bearer ' + token,
+            },
+          })
+            .then(async (response) => {
+              if (!response.ok) {
+                throw new Error('Unable to load profile');
+              }
+              return response.json();
+            })
+            .then((profile) => {
+              setLoggedInNav(profile?.displayName || profile?.email || 'My account');
+              if (accountSubtle) {
+                accountSubtle.textContent = profile?.email || 'Profile and settings';
+              }
+              if (dropdownEmail) {
+                dropdownEmail.textContent = profile?.email || 'Profile and settings';
+              }
+            })
+            .catch(() => {
+              setLoggedInNav();
+            });
+        }
+
+        const closeDropdown = () => {
+          if (accountDropdown) {
+            accountDropdown.hidden = true;
+          }
+          if (accountTrigger) {
+            accountTrigger.classList.remove('open');
+            accountTrigger.setAttribute('aria-expanded', 'false');
+          }
+        };
+
+        const toggleDropdown = () => {
+          if (!accountDropdown || !accountTrigger) {
+            return;
+          }
+
+          const willOpen = accountDropdown.hidden;
+          accountDropdown.hidden = !willOpen;
+          accountTrigger.classList.toggle('open', willOpen);
+          accountTrigger.setAttribute('aria-expanded', String(willOpen));
+        };
+
+        if (accountTrigger) {
+          accountTrigger.addEventListener('click', (event) => {
+            event.stopPropagation();
+            toggleDropdown();
+          });
+        }
+
+        if (accountDropdown) {
+          accountDropdown.addEventListener('click', (event) => {
+            event.stopPropagation();
+          });
+        }
+
+        document.addEventListener('click', () => {
+          closeDropdown();
+        });
+
+        document.addEventListener('keydown', (event) => {
+          if (event.key === 'Escape') {
+            closeDropdown();
+          }
+        });
+
+        if (logoutButton) {
+          logoutButton.addEventListener('click', () => {
+            localStorage.removeItem('auctionHouseToken');
+            window.location.href = '/';
+          });
+        }
+      })();
+    </script>
   </body>
 </html>`;
 }
