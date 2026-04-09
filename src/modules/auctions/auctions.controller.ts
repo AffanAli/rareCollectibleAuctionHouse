@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import * as crud from '@nestjsx/crud';
 import { Auction } from 'src/database/entities';
 

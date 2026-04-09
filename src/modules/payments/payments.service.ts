@@ -1,12 +1,12 @@
+import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
+import { Payment } from 'src/database/entities';
+import { InjectRepository } from '@nestjs/typeorm';
+import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 
 @Injectable()
-export class PaymentsService {
-  /**
-   * Stub: all payment records (intended for admin-only in a later iteration).
-   * @returns { { items: unknown[] } }
-   */
-  findAll(): { items: unknown[] } {
-    return { items: [] };
+export class PaymentsService extends TypeOrmCrudService<Payment> {
+  constructor(@InjectRepository(Payment) public repo: Repository<Payment>) {
+    super(repo);
   }
 }
