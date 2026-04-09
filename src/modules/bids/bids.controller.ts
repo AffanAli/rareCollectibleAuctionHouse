@@ -1,25 +1,52 @@
-// import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
-// import { BidsService } from './bids.service';
-// import { CreateBidDto } from './dto/create-bid.dto';
-// import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
-// import { UserRole } from 'src/database/enums/user-role.enum';
-// import { Roles } from 'src/modules/utils/decorators/roles.decorator';
-// import { JwtAuthGuard } from 'src/modules/utils/guards/jwt-auth.guard';
-// import { RolesGuard } from 'src/modules/utils/guards/roles.guard';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Request } from 'express';
+import { UserRole } from 'src/database/enums/user-role.enum';
+import { Roles } from 'src/modules/utils/decorators/roles.decorator';
+import { JwtAuthGuard } from 'src/modules/utils/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/modules/utils/guards/roles.guard';
+import { JwtGuardResponse } from 'src/modules/utils/guards/types/jwt-auth.interface';
+import { BidsService } from './bids.service';
+import { CreateBidDto } from './types/create-bid.dto';
 
-// @ApiTags('Auction Bid')
-// @ApiBearerAuth()
-// @UseGuards(JwtAuthGuard, RolesGuard)
-// @Roles(UserRole.User)
-// @Controller('auctions/:auctionId/bids')
-// export class AuctionBidsController {
-//   constructor(private readonly bidsService: BidsService) {}
+type AuthenticatedRequest = Request & { user: JwtGuardResponse };
 
-//   @Post()
-//   create(
-//     @Param('auctionId') auctionId: string,
-//     @Body() dto: CreateBidDto,
-//   ): { message: string } {
-//     return this.bidsService.create(auctionId, dto);
-//   }
-// }
+@ApiTags('Bids')
+@Controller()
+export class BidsController {
+  constructor(private readonly bidsService: BidsService) {}
+
+  @Get('auctions/:auctionId/bids')
+  getAuctionBids(@Param('auctionId', ParseIntPipe) auctionId: number) {
+    return this.bidsService.getAuctionBids(auctionId);
+  }
+
+  @Post('auctions/:auctionId/bids')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.User, UserRole.Admin)
+  placeBid(
+    @Req() req: AuthenticatedRequest,
+    @Param('auctionId', ParseIntPipe) auctionId: number,
+    @Body() dto: CreateBidDto,
+  ) {
+    return this.bidsService.placeBid(req.user.id, auctionId, dto);
+  }
+
+  @Get('users/me/bids')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.User, UserRole.Admin)
+  getMyBids(@Req() req: AuthenticatedRequest) {
+    return this.bidsService.getMyBids(req.user.id);
+  }
+}

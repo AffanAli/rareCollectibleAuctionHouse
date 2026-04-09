@@ -1,13 +1,9 @@
+import { Type } from 'class-transformer';
 import { IsNumber, Min } from 'class-validator';
 
 export class CreateBidDto {
-  @IsNumber()
-  auctionId: number;
-
-  @IsNumber()
-  bidderId: number;
-
-  @IsNumber()
+  @Type(() => Number)
+  @IsNumber({ maxDecimalPlaces: 2 })
   @Min(0.01)
   amount: number;
 }

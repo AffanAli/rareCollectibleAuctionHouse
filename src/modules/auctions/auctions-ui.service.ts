@@ -203,9 +203,27 @@ export class AuctionsUiService {
             <p id="auction-description" class="lead">Fetching auction detail.</p>
             <div id="auction-pills" class="pill-row" style="margin-top: 18px;"></div>
             <div id="auction-meta" class="grid grid-2" style="margin-top: 22px;"></div>
+            <section class="info-card" style="margin-top: 22px;">
+              <div class="kicker">Bidding</div>
+              <h3 style="margin-top: 10px;">Place a bid</h3>
+              <p class="muted" id="bidding-summary" style="margin-top: 10px;">
+                Loading bid history...
+              </p>
+              <form id="bid-form" style="margin-top: 18px;">
+                <label>
+                  Your bid amount
+                  <input type="number" name="amount" min="0.01" step="0.01" placeholder="Enter your bid" />
+                </label>
+                <div class="toolbar">
+                  <button class="button-primary" type="submit">Place bid</button>
+                  <a class="button button-secondary" href="/bids">My bids</a>
+                </div>
+              </form>
+              <div id="bid-status" class="status" aria-live="polite"></div>
+            </section>
             <div class="hero-actions" style="margin-top: 24px;">
               <a class="button button-secondary" href="/marketplace">Back to marketplace</a>
-              <a class="button button-primary" href="/login">Log in before bidding launches</a>
+              <a class="button button-primary" href="/bids">Track my bids</a>
             </div>
           </article>
         </section>
@@ -225,6 +243,26 @@ export class AuctionsUiService {
 
         <section class="section-title reveal delay-4">
           <div>
+            <div class="kicker">Bid history</div>
+            <h2>Recent bids on this auction</h2>
+          </div>
+          <p>See the latest activity and the current leading amount for this listing.</p>
+        </section>
+        <section id="bid-history" class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Bidder</th>
+                <th>Amount</th>
+                <th>Placed</th>
+              </tr>
+            </thead>
+            <tbody id="bid-history-body"></tbody>
+          </table>
+        </section>
+
+        <section class="section-title reveal delay-4" style="margin-top: 24px;">
+          <div>
             <div class="kicker">Gallery</div>
             <h2>Additional listing images</h2>
           </div>
@@ -235,6 +273,7 @@ export class AuctionsUiService {
       </main>
       <script>
         const auctionId = ${auctionId};
+        const token = localStorage.getItem('auctionHouseToken');
         const title = document.getElementById('auction-title');
         const description = document.getElementById('auction-description');
         const pills = document.getElementById('auction-pills');
@@ -243,12 +282,49 @@ export class AuctionsUiService {
         const shipping = document.getElementById('auction-shipping');
         const galleryPrimary = document.getElementById('gallery-primary');
         const galleryGrid = document.getElementById('gallery-grid');
+        const bidHistoryBody = document.getElementById('bid-history-body');
+        const biddingSummary = document.getElementById('bidding-summary');
+        const bidForm = document.getElementById('bid-form');
+        const bidStatus = document.getElementById('bid-status');
         const errorBox = document.getElementById('auction-error');
 
         const formatMoney = (value) =>
           new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(Number(value || 0));
         const formatDate = (value) =>
           new Intl.DateTimeFormat('en-GB', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
+
+        const setBidStatus = (message, type = 'success') => {
+          bidStatus.className = \`status \${type} visible\`;
+          bidStatus.textContent = message;
+        };
+
+        async function loadBidHistory() {
+          const response = await fetch(\`/auctions/\${auctionId}/bids\`);
+          const summary = await response.json().catch(() => null);
+
+          if (!response.ok || !summary) {
+            throw new Error(summary?.message || 'Unable to load bidding data.');
+          }
+
+          const current = summary.currentHighBid
+            ? \`Current high bid: \${formatMoney(summary.currentHighBid.amount)}\`
+            : 'No bids yet. You can open the bidding.';
+          biddingSummary.textContent = \`\${current} Minimum next bid: \${formatMoney(summary.minimumNextBid)}.\`;
+          bidForm.amount.min = summary.minimumNextBid;
+          bidForm.amount.placeholder = summary.minimumNextBid.toFixed(2);
+
+          bidHistoryBody.innerHTML = (summary.recentBids || []).map((bid) => \`
+            <tr>
+              <td>\${bid.bidder.displayName}</td>
+              <td>\${formatMoney(bid.amount)}</td>
+              <td>\${formatDate(bid.createdAt)}</td>
+            </tr>
+          \`).join('');
+
+          if ((summary.recentBids || []).length === 0) {
+            bidHistoryBody.innerHTML = '<tr><td colspan="3">No bids placed yet.</td></tr>';
+          }
+        }
 
         async function loadAuction() {
           const response = await fetch(\`/auctions/\${auctionId}\`);
@@ -303,7 +379,42 @@ export class AuctionsUiService {
               <div class="media-frame"><img src="\${image.url}" alt="\${auction.title}" /></div>
             </article>
           \`).join('');
+
+          await loadBidHistory();
         }
+
+        bidForm.addEventListener('submit', async (event) => {
+          event.preventDefault();
+
+          if (!token) {
+            setBidStatus('Please log in before placing a bid.', 'error');
+            return;
+          }
+
+          try {
+            const response = await fetch(\`/auctions/\${auctionId}/bids\`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + token,
+              },
+              body: JSON.stringify({
+                amount: Number(bidForm.amount.value),
+              }),
+            });
+            const result = await response.json().catch(() => null);
+
+            if (!response.ok) {
+              throw new Error(result?.message || 'Unable to place bid.');
+            }
+
+            setBidStatus('Bid placed successfully.');
+            bidForm.reset();
+            await loadBidHistory();
+          } catch (error) {
+            setBidStatus(error instanceof Error ? error.message : 'Something went wrong.', 'error');
+          }
+        });
 
         loadAuction().catch((error) => {
           errorBox.className = 'status error visible';
