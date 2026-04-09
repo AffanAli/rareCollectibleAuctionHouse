@@ -1,12 +1,23 @@
-import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
-import { Payment } from 'src/database/entities';
 import { InjectRepository } from '@nestjs/typeorm';
-import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
+import { Payment } from '../../database/entities';
+import { Repository } from 'typeorm';
 
 @Injectable()
-export class PaymentsService extends TypeOrmCrudService<Payment> {
-  constructor(@InjectRepository(Payment) public repo: Repository<Payment>) {
-    super(repo);
+export class PaymentsService {
+  constructor(
+    @InjectRepository(Payment)
+    public readonly repo: Repository<Payment>,
+  ) {}
+
+  async getAdminPayments() {
+    return this.repo.find({
+      relations: {
+        auction: true,
+        payer: true,
+        payee: true,
+      },
+      order: { createdAt: 'DESC' },
+    });
   }
 }

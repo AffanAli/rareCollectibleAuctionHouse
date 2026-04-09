@@ -1,61 +1,56 @@
-import * as crud from '@nestjsx/crud';
-import { Controller, UseGuards } from '@nestjs/common';
-import { DisputesService } from './disputes.service';
-import { Dispute } from 'src/database/entities';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Request } from 'express';
 import { UserRole } from 'src/database/enums/user-role.enum';
 import { Roles } from 'src/modules/utils/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/modules/utils/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/modules/utils/guards/roles.guard';
-import { CreateDisputeDto, UpdateDisputeDto } from './types/dispute.dto';
+import { JwtGuardResponse } from 'src/modules/utils/guards/types/jwt-auth.interface';
+import { DisputesService } from './disputes.service';
+import { CreateDisputeDto } from './types/dispute.dto';
 
-@crud.Crud({
-  model: { type: Dispute },
-  dto: {
-    create: CreateDisputeDto,
-    update: UpdateDisputeDto,
-  },
-  routes: {
-    exclude: ['replaceOneBase', 'deleteOneBase', 'createManyBase'],
-  },
-})
+type AuthenticatedRequest = Request & { user: JwtGuardResponse };
+
 @ApiTags('Disputes')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.User, UserRole.Admin)
 @Controller('disputes')
 export class DisputesController {
-  constructor(readonly service: DisputesService) {}
+  constructor(private readonly disputesService: DisputesService) {}
 
-  get base(): crud.CrudController<Dispute> {
-    return this;
+  @Get('mine')
+  getMine(@Req() req: AuthenticatedRequest) {
+    return this.disputesService.getMyDisputes(req.user.id);
   }
 
-  @crud.Override('getOneBase')
-  getOne(@crud.ParsedRequest() req: crud.CrudRequest) {
-    return this.base?.getOneBase?.(req);
+  @Get('eligible-auctions')
+  getEligibleAuctions(@Req() req: AuthenticatedRequest) {
+    return this.disputesService.listEligibleAuctions(req.user.id);
   }
 
-  @crud.Override('getManyBase')
-  getMany(@crud.ParsedRequest() req: crud.CrudRequest) {
-    return this.base?.getManyBase?.(req);
-  }
-
-  @crud.Override('createOneBase')
-  async createOne(
-    @crud.ParsedRequest() req: crud.CrudRequest,
-    @crud.ParsedBody() dto: CreateDisputeDto,
+  @Get(':id')
+  getOne(
+    @Req() req: AuthenticatedRequest,
+    @Param('id', ParseIntPipe) id: number,
   ) {
-    return this.base?.createOneBase?.(req, {
-      ...dto,
-    } as unknown as Dispute);
+    return this.disputesService.getDisputeForUser(req.user.id, req.user.role, id);
   }
 
-  @crud.Override('updateOneBase')
-  updateOne(
-    @crud.ParsedRequest() req: crud.CrudRequest,
-    @crud.ParsedBody() dto: UpdateDisputeDto,
+  @Post()
+  create(
+    @Req() req: AuthenticatedRequest,
+    @Body() dto: CreateDisputeDto,
   ) {
-    return this.base?.updateOneBase?.(req, dto as unknown as Dispute);
+    return this.disputesService.createDispute(req.user.id, dto);
   }
 }

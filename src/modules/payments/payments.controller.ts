@@ -1,38 +1,21 @@
-import * as crud from '@nestjsx/crud';
-import { Controller, UseGuards } from '@nestjs/common';
-import { Payment } from 'src/database/entities';
-import { PaymentsService } from './payments.service';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UserRole } from 'src/database/enums/user-role.enum';
 import { Roles } from 'src/modules/utils/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/modules/utils/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/modules/utils/guards/roles.guard';
+import { PaymentsService } from './payments.service';
 
-@crud.Crud({
-  model: { type: Payment },
-  routes: {
-    only: ['getManyBase', 'getOneBase'],
-  },
-})
 @ApiTags('Payments')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(UserRole.Admin, UserRole.User)
+@Roles(UserRole.Admin)
 @Controller('payments')
 export class PaymentsController {
-  constructor(public readonly service: PaymentsService) {}
+  constructor(private readonly paymentsService: PaymentsService) {}
 
-  get base(): crud.CrudController<Payment> {
-    return this;
-  }
-
-  @crud.Override('getOneBase')
-  getOne(@crud.ParsedRequest() req: crud.CrudRequest) {
-    return this.base?.getOneBase?.(req);
-  }
-
-  @crud.Override('getManyBase')
-  getMany(@crud.ParsedRequest() req: crud.CrudRequest) {
-    return this.base?.getManyBase?.(req);
+  @Get()
+  getAdminPayments() {
+    return this.paymentsService.getAdminPayments();
   }
 }

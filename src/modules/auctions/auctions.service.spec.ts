@@ -2,7 +2,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { AuctionStatus } from '../../database/enums/auction-status.enum';
-import { Auction, AuctionImage, Notification } from '../../database/entities';
+import {
+  Auction,
+  AuctionImage,
+  Notification,
+  Payment,
+} from '../../database/entities';
 import { AuctionsService } from './auctions.service';
 
 function buildAuction(overrides: Partial<Auction> = {}): Auction {
@@ -76,9 +81,16 @@ describe('AuctionsService', () => {
     create: jest.fn(),
   };
 
+  const paymentsRepo = {
+    findOne: jest.fn(),
+    save: jest.fn(),
+    create: jest.fn(),
+  };
+
   beforeEach(async () => {
     jest.clearAllMocks();
     auctionsRepo.find.mockResolvedValue([]);
+    paymentsRepo.findOne.mockResolvedValue(null);
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -94,6 +106,10 @@ describe('AuctionsService', () => {
         {
           provide: getRepositoryToken(Notification),
           useValue: notificationsRepo,
+        },
+        {
+          provide: getRepositoryToken(Payment),
+          useValue: paymentsRepo,
         },
       ],
     }).compile();
@@ -156,6 +172,8 @@ describe('AuctionsService', () => {
     auctionsRepo.save.mockImplementation(async (auction: Auction) => auction);
     notificationsRepo.create.mockImplementation((payload) => payload);
     notificationsRepo.save.mockResolvedValue(undefined);
+    paymentsRepo.create.mockImplementation((payload) => payload);
+    paymentsRepo.save.mockResolvedValue(undefined);
 
     await service.settleExpiredAuctions();
 
@@ -166,5 +184,8 @@ describe('AuctionsService', () => {
       }),
     );
     expect(notificationsRepo.save).toHaveBeenCalled();
+    expect(paymentsRepo.save).toHaveBeenCalledWith(
+      expect.objectContaining({ amount: 250 }),
+    );
   });
 });

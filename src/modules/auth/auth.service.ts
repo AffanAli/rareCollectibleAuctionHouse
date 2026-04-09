@@ -35,6 +35,9 @@ export class AuthService {
   async login(email: string, password: string) {
     const user = await this.usersService.findOne({ where: { email } });
     if (!user) throw new UnauthorizedException('Invalid credentials');
+    if (!user.isActive) {
+      throw new UnauthorizedException('This account has been suspended');
+    }
 
     const isValid = await bcrypt.compare(password, user.passwordHash);
     if (!isValid) throw new UnauthorizedException('Invalid credentials');

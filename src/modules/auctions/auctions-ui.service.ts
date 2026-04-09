@@ -242,6 +242,7 @@ export class AuctionsUiService {
             <div class="hero-actions" style="margin-top: 24px;">
               <a class="button button-secondary" href="/marketplace">Back to marketplace</a>
               <a class="button button-primary" href="/bids">Track my bids</a>
+              <a class="button button-ghost" id="dispute-link" href="/disputes?auctionId=${auctionId}">Raise dispute</a>
             </div>
           </article>
         </section>
@@ -306,6 +307,7 @@ export class AuctionsUiService {
         const bidStatus = document.getElementById('bid-status');
         const messageForm = document.getElementById('message-form');
         const messageStatus = document.getElementById('message-status');
+        const disputeLink = document.getElementById('dispute-link');
         const errorBox = document.getElementById('auction-error');
 
         const formatMoney = (value) =>
@@ -409,6 +411,8 @@ export class AuctionsUiService {
             bidForm.querySelector('button[type="submit"]').disabled = true;
             bidForm.amount.disabled = true;
             biddingSummary.textContent = \`Auction closed. \${resultText}\`;
+          } else if (disputeLink) {
+            disputeLink.style.display = 'none';
           }
           galleryPrimary.innerHTML = primaryImage
             ? \`<img src="\${primaryImage}" alt="\${auction.title}" />\`

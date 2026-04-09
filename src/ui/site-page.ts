@@ -6,7 +6,9 @@ export type SitePagePath =
   | '/bids'
   | '/messages'
   | '/notifications'
+  | '/disputes'
   | '/profile'
+  | '/admin/dashboard'
   | '/seller/auctions'
   | '/seller/auctions/new';
 
@@ -833,7 +835,9 @@ export function renderSitePage({
           <a class="nav-link${activePath === '/bids' ? ' active' : ''}" href="/bids">My bids</a>
           <a class="nav-link${activePath === '/messages' ? ' active' : ''}" href="/messages">Messages</a>
           <a class="nav-link${activePath === '/notifications' ? ' active' : ''}" href="/notifications/page">Notifications</a>
+          <a class="nav-link user-only${activePath === '/disputes' ? ' active' : ''}" href="/disputes" style="display: none;">Disputes</a>
           <a class="nav-link${activePath === '/seller/auctions' || activePath === '/seller/auctions/new' ? ' active' : ''}" href="/seller/auctions">Sell</a>
+          <a class="nav-link user-only admin-only${activePath === '/admin/dashboard' ? ' active' : ''}" href="/admin/dashboard" style="display: none;">Admin</a>
           <a class="nav-link guest-only${activePath === '/login' ? ' active' : ''}" href="/login">Login</a>
           <a class="nav-link guest-only${activePath === '/register' ? ' active' : ''}" href="/register">Register</a>
           <a class="nav-link" href="/api">API Docs</a>
@@ -881,7 +885,9 @@ export function renderSitePage({
                 <a class="dropdown-item" href="/bids" role="menuitem">My bids</a>
                 <a class="dropdown-item" href="/messages" role="menuitem">Messages</a>
                 <a class="dropdown-item" href="/notifications/page" role="menuitem">Notifications</a>
+                <a class="dropdown-item" href="/disputes" role="menuitem">Disputes</a>
                 <a class="dropdown-item" href="/seller/auctions" role="menuitem">My auctions</a>
+                <a class="dropdown-item admin-only" href="/admin/dashboard" role="menuitem" style="display: none;">Admin dashboard</a>
                 <button class="dropdown-item" id="logout-button" type="button" role="menuitem">Log out</button>
               </div>
             </div>
@@ -895,6 +901,7 @@ export function renderSitePage({
         const token = localStorage.getItem('auctionHouseToken');
         const guestOnly = document.querySelectorAll('.guest-only');
         const userOnly = document.querySelectorAll('.user-only');
+        const adminOnly = document.querySelectorAll('.admin-only');
         const logoutButton = document.getElementById('logout-button');
         const accountTrigger = document.getElementById('account-trigger');
         const accountDropdown = document.getElementById('account-dropdown');
@@ -918,14 +925,20 @@ export function renderSitePage({
           userOnly.forEach((element) => {
             element.style.display = 'none';
           });
+          adminOnly.forEach((element) => {
+            element.style.display = 'none';
+          });
         };
 
-        const setLoggedInNav = (label = 'My account') => {
+        const setLoggedInNav = (label = 'My account', isAdmin = false) => {
           guestOnly.forEach((element) => {
             element.style.display = 'none';
           });
           userOnly.forEach((element) => {
             element.style.display = '';
+          });
+          adminOnly.forEach((element) => {
+            element.style.display = isAdmin ? '' : 'none';
           });
 
           const trimmed = String(label || 'My account').trim();
@@ -962,7 +975,10 @@ export function renderSitePage({
               return response.json();
             })
             .then((profile) => {
-              setLoggedInNav(profile?.displayName || profile?.email || 'My account');
+              setLoggedInNav(
+                profile?.displayName || profile?.email || 'My account',
+                profile?.role === 'ADMIN',
+              );
               if (accountSubtle) {
                 accountSubtle.textContent = profile?.email || 'Profile and settings';
               }

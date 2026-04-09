@@ -2,12 +2,19 @@ import { Module } from '@nestjs/common';
 import { AuctionsController } from './auctions.controller';
 import { AuctionsService } from './auctions.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Auction, AuctionImage, Notification } from 'src/database/entities';
+import {
+  Auction,
+  AuctionImage,
+  Notification,
+  Payment,
+} from 'src/database/entities';
 import { AuctionsUiService } from './auctions-ui.service';
 import { AuctionsPagesController } from './auctions-pages.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Auction, AuctionImage, Notification])],
+  imports: [
+    TypeOrmModule.forFeature([Auction, AuctionImage, Notification, Payment]),
+  ],
   controllers: [AuctionsController, AuctionsPagesController],
   providers: [AuctionsService, AuctionsUiService],
   exports: [AuctionsService],

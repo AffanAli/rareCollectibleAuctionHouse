@@ -7,7 +7,14 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuctionStatus } from '../../database/enums/auction-status.enum';
-import { Auction, AuctionImage, Bid, Notification } from '../../database/entities';
+import { PaymentStatus } from '../../database/enums/payment-status.enum';
+import {
+  Auction,
+  AuctionImage,
+  Bid,
+  Notification,
+  Payment,
+} from '../../database/entities';
 import {
   AuctionImageInputDto,
   AuctionListQueryDto,
@@ -59,6 +66,8 @@ export class AuctionsService {
     private readonly auctionImagesRepo: Repository<AuctionImage>,
     @InjectRepository(Notification)
     private readonly notificationsRepo: Repository<Notification>,
+    @InjectRepository(Payment)
+    private readonly paymentsRepo: Repository<Payment>,
   ) {}
 
   async listPublicAuctions(query: AuctionListQueryDto): Promise<AuctionResponse[]> {
@@ -337,6 +346,24 @@ export class AuctionsService {
     await this.auctionsRepo.save(auction);
 
     if (winningBid?.bidder) {
+      const existingPayment = await this.paymentsRepo.findOne({
+        where: { auction: { id: auction.id } },
+      });
+
+      if (!existingPayment) {
+        await this.paymentsRepo.save(
+          this.paymentsRepo.create({
+            auction: { id: auction.id } as Payment['auction'],
+            payer: { id: winningBid.bidder.id } as Payment['payer'],
+            payee: { id: auction.seller.id } as Payment['payee'],
+            amount: winningBid.amount,
+            currency: 'GBP',
+            status: PaymentStatus.Pending,
+            externalReference: null,
+          }),
+        );
+      }
+
       await this.notificationsRepo.save([
         this.notificationsRepo.create({
           user: { id: winningBid.bidder.id } as Notification['user'],
