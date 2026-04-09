@@ -15,10 +15,17 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return API health string', () => {
+    it('should return API health string from the health endpoint handler', () => {
       expect(appController.getHealth()).toBe(
         'Rare Collectible Auction House API',
       );
+    });
+
+    it('should render the public landing page', () => {
+      expect(appController.getLandingPage()).toContain(
+        'Rare Collectible Auction House',
+      );
+      expect(appController.getLandingPage()).toContain('Create your account');
     });
   });
 });

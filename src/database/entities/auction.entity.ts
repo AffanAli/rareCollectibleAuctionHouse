@@ -30,6 +30,12 @@ export class Auction {
   @Column({ type: 'text' })
   description: string;
 
+  @Column({ type: 'varchar', length: 120 })
+  category: string;
+
+  @Column({ name: 'item_condition', type: 'varchar', length: 120 })
+  itemCondition: string;
+
   @Column({
     type: 'enum',
     enum: AuctionStatus,
@@ -52,6 +58,25 @@ export class Auction {
     transformer: numericValueTransformer,
   })
   startingPrice: number;
+
+  @Column({
+    name: 'reserve_price',
+    type: 'numeric',
+    precision: 12,
+    scale: 2,
+    nullable: true,
+    transformer: numericValueTransformer,
+  })
+  reservePrice: number | null;
+
+  @Column({ type: 'text', nullable: true })
+  provenance: string | null;
+
+  @Column({ type: 'varchar', length: 160 })
+  location: string;
+
+  @Column({ name: 'shipping_notes', type: 'text', nullable: true })
+  shippingNotes: string | null;
 
   @ManyToOne(() => Bid, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'current_high_bid_id' })

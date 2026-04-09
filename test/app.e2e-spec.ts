@@ -1,29 +1,27 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
-import request from 'supertest';
-import { App } from 'supertest/types';
+import { AppController } from '../src/app.controller';
 import { AppE2eModule } from './app-e2e.module';
 
 describe('AppController (e2e)', () => {
-  let app: INestApplication<App>;
+  let appController: AppController;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppE2eModule],
     }).compile();
 
-    app = moduleFixture.createNestApplication();
-    await app.init();
+    appController = moduleFixture.get<AppController>(AppController);
   });
 
   it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Rare Collectible Auction House API');
+    const html = appController.getLandingPage();
+    expect(html).toContain('Rare Collectible Auction House');
+    expect(html).toContain('Create your account');
   });
 
-  afterEach(async () => {
-    await app.close();
+  it('/health (GET)', () => {
+    expect(appController.getHealth()).toBe(
+      'Rare Collectible Auction House API',
+    );
   });
 });
