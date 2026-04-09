@@ -64,6 +64,7 @@ export class AdminUiService {
         const sections = document.getElementById('admin-sections');
 
         const api = async (path, options = {}) => {
+          console.log('API call to:', path, 'with token:', token);
           const response = await fetch(path, {
             ...options,
             headers: {
@@ -72,8 +73,10 @@ export class AdminUiService {
               ...(options.headers || {}),
             },
           });
+          console.log('Response status:', response.status);
           const data = await response.json().catch(() => null);
           if (!response.ok) {
+            console.log('API error:', data);
             throw new Error(data?.message || 'Request failed.');
           }
           return data;
@@ -94,7 +97,7 @@ export class AdminUiService {
         }
 
         async function loadDashboard() {
-          const dashboard = await api('/admin/dashboard');
+          const dashboard = await api('/admin/api/dashboard');
           document.getElementById('metric-users').textContent = String(dashboard.summary.users);
           document.getElementById('metric-auctions').textContent = String(dashboard.summary.auctions);
           document.getElementById('metric-disputes').textContent = String(dashboard.summary.disputes);

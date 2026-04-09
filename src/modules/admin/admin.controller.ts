@@ -29,7 +29,7 @@ export class AdminController {
     private readonly paymentsService: PaymentsService,
   ) {}
 
-  @Get('dashboard')
+  @Get('api/dashboard')
   getDashboard() {
     return this.adminService.getDashboard();
   }
