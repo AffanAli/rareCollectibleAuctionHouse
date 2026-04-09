@@ -5,6 +5,7 @@ export type SitePagePath =
   | '/marketplace'
   | '/bids'
   | '/messages'
+  | '/notifications'
   | '/profile'
   | '/seller/auctions'
   | '/seller/auctions/new';
@@ -211,6 +212,84 @@ export function renderSitePage({
       .account-menu {
         position: relative;
         justify-content: flex-end;
+      }
+
+      .notification-menu {
+        position: relative;
+      }
+
+      .notification-trigger {
+        position: relative;
+        display: inline-grid;
+        place-items: center;
+        width: 48px;
+        height: 48px;
+        border-radius: 999px;
+        border: 1px solid rgba(159, 79, 47, 0.14);
+        background: rgba(255, 252, 247, 0.92);
+        box-shadow: 0 10px 28px rgba(57, 37, 19, 0.08);
+      }
+
+      .notification-trigger.open,
+      .notification-trigger:hover,
+      .notification-trigger:focus-visible {
+        background: rgba(255, 248, 239, 0.98);
+        border-color: rgba(159, 79, 47, 0.24);
+      }
+
+      .notification-badge {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        min-width: 22px;
+        height: 22px;
+        padding: 0 6px;
+        border-radius: 999px;
+        display: inline-grid;
+        place-items: center;
+        color: #fff9f3;
+        background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+        font-size: 0.75rem;
+        font-weight: 700;
+      }
+
+      .notification-dropdown {
+        position: absolute;
+        top: calc(100% + 12px);
+        right: 0;
+        width: min(360px, calc(100vw - 40px));
+        padding: 10px;
+        border-radius: 20px;
+        border: 1px solid rgba(92, 70, 44, 0.14);
+        background: rgba(255, 252, 247, 0.98);
+        backdrop-filter: blur(18px);
+        box-shadow: 0 20px 44px rgba(57, 37, 19, 0.18);
+      }
+
+      .notification-dropdown[hidden] {
+        display: none;
+      }
+
+      .notification-list {
+        display: grid;
+        gap: 8px;
+        max-height: 360px;
+        overflow-y: auto;
+        padding-top: 8px;
+      }
+
+      .notification-item {
+        display: grid;
+        gap: 6px;
+        padding: 12px;
+        border-radius: 16px;
+        border: 1px solid rgba(95, 108, 123, 0.1);
+        background: rgba(255, 255, 255, 0.76);
+      }
+
+      .notification-item.unread {
+        border-color: rgba(159, 79, 47, 0.2);
+        background: rgba(255, 248, 239, 0.95);
       }
 
       .account-trigger {
@@ -753,6 +832,7 @@ export function renderSitePage({
           <a class="nav-link${activePath === '/profile' ? ' active' : ''}" href="/profile">Profile</a>
           <a class="nav-link${activePath === '/bids' ? ' active' : ''}" href="/bids">My bids</a>
           <a class="nav-link${activePath === '/messages' ? ' active' : ''}" href="/messages">Messages</a>
+          <a class="nav-link${activePath === '/notifications' ? ' active' : ''}" href="/notifications/page">Notifications</a>
           <a class="nav-link${activePath === '/seller/auctions' || activePath === '/seller/auctions/new' ? ' active' : ''}" href="/seller/auctions">Sell</a>
           <a class="nav-link guest-only${activePath === '/login' ? ' active' : ''}" href="/login">Login</a>
           <a class="nav-link guest-only${activePath === '/register' ? ' active' : ''}" href="/register">Register</a>
@@ -761,6 +841,27 @@ export function renderSitePage({
         <div class="nav-actions" id="nav-actions">
           <a class="button button-secondary guest-only" href="/marketplace">Browse auctions</a>
           <a class="button button-primary guest-only" href="/register">Create account</a>
+          <div class="notification-menu user-only" id="notification-menu" style="display: none;">
+            <button class="notification-trigger" id="notification-trigger" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Open notifications">
+              <span>N</span>
+              <span class="notification-badge" id="notification-badge" style="display: none;">0</span>
+            </button>
+            <div class="notification-dropdown" id="notification-dropdown" hidden>
+              <div class="account-dropdown-header">
+                <span class="dropdown-label">Notifications</span>
+                <span class="dropdown-subtle" id="notification-subtle">Recent activity across your auctions and bids.</span>
+              </div>
+              <div class="notification-list" id="notification-list">
+                <div class="notification-item">
+                  <strong>Loading notifications...</strong>
+                </div>
+              </div>
+              <div class="toolbar" style="padding-top: 10px;">
+                <a class="button button-secondary" href="/notifications/page">Open notification center</a>
+                <button class="button button-ghost" id="notifications-read-all" type="button">Mark all read</button>
+              </div>
+            </div>
+          </div>
           <div class="account-menu user-only" id="account-menu" style="display: none;">
             <button class="account-trigger" id="account-trigger" type="button" aria-haspopup="menu" aria-expanded="false">
               <span class="account-avatar" id="nav-avatar">RC</span>
@@ -779,6 +880,7 @@ export function renderSitePage({
                 <a class="dropdown-item" href="/profile" role="menuitem">Profile</a>
                 <a class="dropdown-item" href="/bids" role="menuitem">My bids</a>
                 <a class="dropdown-item" href="/messages" role="menuitem">Messages</a>
+                <a class="dropdown-item" href="/notifications/page" role="menuitem">Notifications</a>
                 <a class="dropdown-item" href="/seller/auctions" role="menuitem">My auctions</a>
                 <button class="dropdown-item" id="logout-button" type="button" role="menuitem">Log out</button>
               </div>
@@ -796,11 +898,18 @@ export function renderSitePage({
         const logoutButton = document.getElementById('logout-button');
         const accountTrigger = document.getElementById('account-trigger');
         const accountDropdown = document.getElementById('account-dropdown');
+        const notificationTrigger = document.getElementById('notification-trigger');
+        const notificationDropdown = document.getElementById('notification-dropdown');
+        const notificationBadge = document.getElementById('notification-badge');
+        const notificationList = document.getElementById('notification-list');
+        const notificationsReadAll = document.getElementById('notifications-read-all');
         const avatar = document.getElementById('nav-avatar');
         const accountName = document.getElementById('nav-account-name');
         const accountSubtle = document.getElementById('nav-account-subtle');
         const dropdownName = document.getElementById('dropdown-name');
         const dropdownEmail = document.getElementById('dropdown-email');
+        let notificationsSnapshot = '';
+        let notificationsPollingHandle = null;
 
         const setLoggedOutNav = () => {
           guestOnly.forEach((element) => {
@@ -874,6 +983,13 @@ export function renderSitePage({
             accountTrigger.classList.remove('open');
             accountTrigger.setAttribute('aria-expanded', 'false');
           }
+          if (notificationDropdown) {
+            notificationDropdown.hidden = true;
+          }
+          if (notificationTrigger) {
+            notificationTrigger.classList.remove('open');
+            notificationTrigger.setAttribute('aria-expanded', 'false');
+          }
         };
 
         const toggleDropdown = () => {
@@ -894,11 +1010,118 @@ export function renderSitePage({
           });
         }
 
+        const toggleNotificationDropdown = () => {
+          if (!notificationDropdown || !notificationTrigger) {
+            return;
+          }
+
+          const willOpen = notificationDropdown.hidden;
+          notificationDropdown.hidden = !willOpen;
+          notificationTrigger.classList.toggle('open', willOpen);
+          notificationTrigger.setAttribute('aria-expanded', String(willOpen));
+        };
+
+        if (notificationTrigger) {
+          notificationTrigger.addEventListener('click', (event) => {
+            event.stopPropagation();
+            toggleNotificationDropdown();
+          });
+        }
+
         if (accountDropdown) {
           accountDropdown.addEventListener('click', (event) => {
             event.stopPropagation();
           });
         }
+
+        if (notificationDropdown) {
+          notificationDropdown.addEventListener('click', (event) => {
+            event.stopPropagation();
+          });
+        }
+
+        const api = async (path, options = {}) => {
+          const response = await fetch(path, {
+            ...options,
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: 'Bearer ' + token,
+              ...(options.headers || {}),
+            },
+          });
+          const data = await response.json().catch(() => null);
+          if (!response.ok) {
+            throw new Error(data?.message || 'Request failed.');
+          }
+          return data;
+        };
+
+        const buildNotificationSnapshot = (summaryData) =>
+          JSON.stringify({
+            unreadCount: summaryData?.unreadCount || 0,
+            recent: (summaryData?.recent || []).map((notification) => ({
+              id: notification.id,
+              readAt: notification.readAt,
+              createdAt: notification.createdAt,
+            })),
+          });
+
+        const formatDate = (value) =>
+          new Intl.DateTimeFormat('en-GB', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
+
+        const renderNotifications = (summaryData) => {
+          notificationsSnapshot = buildNotificationSnapshot(summaryData);
+          const unreadCount = summaryData?.unreadCount || 0;
+          if (notificationBadge) {
+            notificationBadge.style.display = unreadCount > 0 ? 'inline-grid' : 'none';
+            notificationBadge.textContent = String(unreadCount > 9 ? '9+' : unreadCount);
+          }
+          if (notificationList) {
+            const recent = summaryData?.recent || [];
+            notificationList.innerHTML = recent.length
+              ? recent.map((notification) => \`
+                  <article class="notification-item \${notification.readAt ? '' : 'unread'}">
+                    <strong>\${notification.title}</strong>
+                    <span class="dropdown-subtle">\${notification.body || 'No additional details provided.'}</span>
+                    <span class="dropdown-subtle">\${formatDate(notification.createdAt)}</span>
+                  </article>
+                \`).join('')
+              : '<div class="notification-item"><strong>No notifications yet.</strong></div>';
+          }
+        };
+
+        const pollNotifications = async () => {
+          if (!token || document.hidden) {
+            return;
+          }
+
+          try {
+            const summaryData = await api('/notifications/summary');
+            const nextSnapshot = buildNotificationSnapshot(summaryData);
+            if (nextSnapshot !== notificationsSnapshot) {
+              renderNotifications(summaryData);
+            }
+          } catch {
+            // silent background refresh
+          }
+        };
+
+        const startNotificationPolling = async () => {
+          if (!token) {
+            return;
+          }
+          try {
+            renderNotifications(await api('/notifications/summary'));
+          } catch {
+            // ignore nav summary errors
+          }
+          if (notificationsPollingHandle) {
+            window.clearInterval(notificationsPollingHandle);
+          }
+          notificationsPollingHandle = window.setInterval(() => {
+            pollNotifications();
+          }, 10000);
+        };
 
         document.addEventListener('click', () => {
           closeDropdown();
@@ -916,6 +1139,33 @@ export function renderSitePage({
             window.location.href = '/';
           });
         }
+
+        if (notificationsReadAll) {
+          notificationsReadAll.addEventListener('click', async () => {
+            try {
+              await api('/notifications/read-all', { method: 'PATCH' });
+              renderNotifications(await api('/notifications/summary'));
+            } catch {
+              // ignore nav read-all failures
+            }
+          });
+        }
+
+        if (token) {
+          startNotificationPolling();
+        }
+
+        document.addEventListener('visibilitychange', () => {
+          if (!document.hidden) {
+            pollNotifications();
+          }
+        });
+
+        window.addEventListener('beforeunload', () => {
+          if (notificationsPollingHandle) {
+            window.clearInterval(notificationsPollingHandle);
+          }
+        });
       })();
     </script>
   </body>

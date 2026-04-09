@@ -7,7 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuctionStatus } from '../../database/enums/auction-status.enum';
-import { Auction, AuctionImage } from '../../database/entities';
+import { Auction, AuctionImage, Bid, Notification } from '../../database/entities';
 import {
   AuctionImageInputDto,
   AuctionListQueryDto,
@@ -35,6 +35,14 @@ type AuctionResponse = {
     id: number;
     displayName: string;
   };
+  winningBid: {
+    id: number;
+    amount: number;
+    bidder: {
+      id: number;
+      displayName: string;
+    };
+  } | null;
   images: Array<{
     id: number;
     url: string;
@@ -49,9 +57,12 @@ export class AuctionsService {
     private readonly auctionsRepo: Repository<Auction>,
     @InjectRepository(AuctionImage)
     private readonly auctionImagesRepo: Repository<AuctionImage>,
+    @InjectRepository(Notification)
+    private readonly notificationsRepo: Repository<Notification>,
   ) {}
 
   async listPublicAuctions(query: AuctionListQueryDto): Promise<AuctionResponse[]> {
+    await this.settleExpiredAuctions();
     const builder = this.auctionsRepo
       .createQueryBuilder('auction')
       .leftJoinAndSelect('auction.images', 'image', 'image.deleted_at IS NULL')
@@ -90,9 +101,10 @@ export class AuctionsService {
   }
 
   async getPublicAuction(id: number): Promise<AuctionResponse> {
+    await this.settleExpiredAuctions();
     const auction = await this.auctionsRepo.findOne({
       where: { id },
-      relations: { seller: true, images: true },
+      relations: { seller: true, images: true, winningBid: { bidder: true } },
     });
 
     if (!auction || auction.deletedAt) {
@@ -107,9 +119,10 @@ export class AuctionsService {
   }
 
   async listSellerAuctions(userId: number): Promise<AuctionResponse[]> {
+    await this.settleExpiredAuctions();
     const auctions = await this.auctionsRepo.find({
       where: { seller: { id: userId } },
-      relations: { seller: true, images: true },
+      relations: { seller: true, images: true, winningBid: { bidder: true } },
       order: {
         updatedAt: 'DESC',
         images: { sortOrder: 'ASC', createdAt: 'ASC' },
@@ -122,6 +135,7 @@ export class AuctionsService {
   }
 
   async getSellerAuction(userId: number, id: number): Promise<AuctionResponse> {
+    await this.settleExpiredAuctions();
     const auction = await this.requireSellerAuction(userId, id);
     return this.toAuctionResponse(auction);
   }
@@ -195,6 +209,7 @@ export class AuctionsService {
   }
 
   async publishAuction(userId: number, auctionId: number): Promise<AuctionResponse> {
+    await this.settleExpiredAuctions();
     const auction = await this.requireSellerAuction(userId, auctionId);
     this.validateAuctionWindow(
       auction.startsAt.toISOString(),
@@ -211,6 +226,7 @@ export class AuctionsService {
   }
 
   async cancelAuction(userId: number, auctionId: number): Promise<AuctionResponse> {
+    await this.settleExpiredAuctions();
     const auction = await this.requireSellerAuction(userId, auctionId);
 
     if (auction.status === AuctionStatus.Ended) {
@@ -223,6 +239,7 @@ export class AuctionsService {
   }
 
   async deleteAuction(userId: number, auctionId: number): Promise<{ deleted: true }> {
+    await this.settleExpiredAuctions();
     const auction = await this.requireSellerAuction(userId, auctionId);
 
     if (![AuctionStatus.Draft, AuctionStatus.Cancelled].includes(auction.status)) {
@@ -270,7 +287,7 @@ export class AuctionsService {
   ): Promise<Auction> {
     const auction = await this.auctionsRepo.findOne({
       where: { id: auctionId },
-      relations: { seller: true, images: true },
+      relations: { seller: true, images: true, winningBid: { bidder: true } },
     });
 
     if (!auction || auction.deletedAt) {
@@ -282,6 +299,87 @@ export class AuctionsService {
     }
 
     return auction;
+  }
+
+  async settleExpiredAuctions(): Promise<void> {
+    const expiredAuctions = await this.auctionsRepo.find({
+      where: { status: AuctionStatus.Active },
+      relations: {
+        seller: true,
+        currentHighBid: { bidder: true, auction: true },
+      },
+    });
+
+    const now = new Date();
+
+    for (const auction of expiredAuctions) {
+      if (!auction.deletedAt && auction.endsAt <= now) {
+        await this.finalizeAuction(auction);
+      }
+    }
+  }
+
+  private async finalizeAuction(auction: Auction): Promise<void> {
+    if (auction.status !== AuctionStatus.Active) {
+      return;
+    }
+
+    let winningBid: Bid | null = null;
+    if (
+      auction.currentHighBid &&
+      (!auction.reservePrice || auction.currentHighBid.amount >= auction.reservePrice)
+    ) {
+      winningBid = auction.currentHighBid;
+    }
+
+    auction.status = AuctionStatus.Ended;
+    auction.winningBid = winningBid;
+    await this.auctionsRepo.save(auction);
+
+    if (winningBid?.bidder) {
+      await this.notificationsRepo.save([
+        this.notificationsRepo.create({
+          user: { id: winningBid.bidder.id } as Notification['user'],
+          type: 'AUCTION_WON',
+          title: `You won "${auction.title}"`,
+          body: `The auction has ended and your bid of ${winningBid.amount.toFixed(2)} is the winner.`,
+          payloadJson: {
+            auctionId: auction.id,
+            winningBidId: winningBid.id,
+            amount: winningBid.amount,
+          },
+          auction: { id: auction.id } as Notification['auction'],
+        }),
+        this.notificationsRepo.create({
+          user: { id: auction.seller.id } as Notification['user'],
+          type: 'AUCTION_ENDED',
+          title: `Auction ended: "${auction.title}"`,
+          body: `${winningBid.bidder.displayName || `Bidder #${winningBid.bidder.id}`} won the auction with a bid of ${winningBid.amount.toFixed(2)}.`,
+          payloadJson: {
+            auctionId: auction.id,
+            winningBidId: winningBid.id,
+            winnerUserId: winningBid.bidder.id,
+            amount: winningBid.amount,
+          },
+          auction: { id: auction.id } as Notification['auction'],
+        }),
+      ]);
+      return;
+    }
+
+    await this.notificationsRepo.save(
+      this.notificationsRepo.create({
+        user: { id: auction.seller.id } as Notification['user'],
+        type: 'AUCTION_ENDED',
+        title: `Auction ended: "${auction.title}"`,
+        body: 'The auction has ended without a winning bidder.',
+        payloadJson: {
+          auctionId: auction.id,
+          winningBidId: null,
+        },
+        auction: { id: auction.id } as Notification['auction'],
+      }),
+    );
   }
 
   private async replaceAuctionImages(
@@ -330,6 +428,18 @@ export class AuctionsService {
         id: auction.seller.id,
         displayName: auction.seller.displayName || `Seller #${auction.seller.id}`,
       },
+      winningBid: auction.winningBid
+        ? {
+            id: auction.winningBid.id,
+            amount: auction.winningBid.amount,
+            bidder: {
+              id: auction.winningBid.bidder.id,
+              displayName:
+                auction.winningBid.bidder.displayName ||
+                `Bidder #${auction.winningBid.bidder.id}`,
+            },
+          }
+        : null,
       images: (auction.images ?? [])
         .filter((image) => !image.deletedAt)
         .sort((a, b) => a.sortOrder - b.sortOrder || a.id - b.id)

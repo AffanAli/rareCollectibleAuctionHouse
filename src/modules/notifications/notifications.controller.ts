@@ -1,38 +1,51 @@
-import * as crud from '@nestjsx/crud';
-import { Notification } from 'src/database/entities';
-import { Controller, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Patch,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Request } from 'express';
 import { UserRole } from 'src/database/enums/user-role.enum';
-import { NotificationsService } from './notifications.service';
-import { RolesGuard } from 'src/modules/utils/guards/roles.guard';
 import { Roles } from 'src/modules/utils/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/modules/utils/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/modules/utils/guards/roles.guard';
+import { JwtGuardResponse } from 'src/modules/utils/guards/types/jwt-auth.interface';
+import { NotificationsService } from './notifications.service';
 
-@crud.Crud({
-  model: { type: Notification },
-  routes: {
-    only: ['getManyBase', 'getOneBase'],
-  },
-})
-@ApiTags('Notification')
+type AuthenticatedRequest = Request & { user: JwtGuardResponse };
+
+@ApiTags('Notifications')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.Admin, UserRole.User)
 @Controller('notifications')
 export class NotificationsController {
-  constructor(public readonly service: NotificationsService) {}
+  constructor(private readonly notificationsService: NotificationsService) {}
 
-  get base(): crud.CrudController<Notification> {
-    return this;
+  @Get()
+  getMine(@Req() req: AuthenticatedRequest) {
+    return this.notificationsService.getMine(req.user.id);
   }
 
-  @crud.Override('getOneBase')
-  getOne(@crud.ParsedRequest() req: crud.CrudRequest) {
-    return this.base?.getOneBase?.(req);
+  @Get('summary')
+  getSummary(@Req() req: AuthenticatedRequest) {
+    return this.notificationsService.getSummary(req.user.id);
   }
 
-  @crud.Override('getManyBase')
-  getMany(@crud.ParsedRequest() req: crud.CrudRequest) {
-    return this.base?.getManyBase?.(req);
+  @Patch('read-all')
+  markAllAsRead(@Req() req: AuthenticatedRequest) {
+    return this.notificationsService.markAllAsRead(req.user.id);
+  }
+
+  @Patch(':id/read')
+  markAsRead(
+    @Req() req: AuthenticatedRequest,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.notificationsService.markAsRead(req.user.id, id);
   }
 }

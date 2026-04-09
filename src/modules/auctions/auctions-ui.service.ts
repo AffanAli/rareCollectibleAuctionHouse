@@ -360,6 +360,11 @@ export class AuctionsUiService {
           }
 
           const primaryImage = auction.images?.[0]?.url;
+          const resultText = auction.status === 'ENDED'
+            ? (auction.winningBid
+              ? \`Won by \${auction.winningBid.bidder.displayName} at \${formatMoney(auction.winningBid.amount)}\`
+              : 'Ended without a winning bidder')
+            : 'Result available when the auction ends.';
           title.textContent = auction.title;
           description.textContent = auction.description;
           pills.innerHTML = \`
@@ -393,9 +398,18 @@ export class AuctionsUiService {
               <h3>Listing updated</h3>
               <p>\${formatDate(auction.updatedAt)}</p>
             </div>
+            <div class="feature-card">
+              <h3>Auction result</h3>
+              <p>\${resultText}</p>
+            </div>
           \`;
           provenance.textContent = auction.provenance || 'No provenance notes were provided.';
           shipping.textContent = auction.shippingNotes || 'No shipping notes were provided.';
+          if (auction.status === 'ENDED') {
+            bidForm.querySelector('button[type="submit"]').disabled = true;
+            bidForm.amount.disabled = true;
+            biddingSummary.textContent = \`Auction closed. \${resultText}\`;
+          }
           galleryPrimary.innerHTML = primaryImage
             ? \`<img src="\${primaryImage}" alt="\${auction.title}" />\`
             : '<span>No image provided yet</span>';

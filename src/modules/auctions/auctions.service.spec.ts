@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { AuctionStatus } from '../../database/enums/auction-status.enum';
-import { Auction, AuctionImage } from '../../database/entities';
+import { Auction, AuctionImage, Notification } from '../../database/entities';
 import { AuctionsService } from './auctions.service';
 
 function buildAuction(overrides: Partial<Auction> = {}): Auction {
@@ -71,8 +71,14 @@ describe('AuctionsService', () => {
     create: jest.fn(),
   };
 
+  const notificationsRepo = {
+    save: jest.fn(),
+    create: jest.fn(),
+  };
+
   beforeEach(async () => {
     jest.clearAllMocks();
+    auctionsRepo.find.mockResolvedValue([]);
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -84,6 +90,10 @@ describe('AuctionsService', () => {
         {
           provide: getRepositoryToken(AuctionImage),
           useValue: auctionImagesRepo,
+        },
+        {
+          provide: getRepositoryToken(Notification),
+          useValue: notificationsRepo,
         },
       ],
     }).compile();
@@ -124,5 +134,37 @@ describe('AuctionsService', () => {
       displayName: 'Collector Loft',
     });
     expect((result as { seller: { passwordHash?: string } }).seller.passwordHash).toBeUndefined();
+  });
+
+  it('settles ended auctions and stores the winning bid', async () => {
+    const winningBid = {
+      id: 44,
+      amount: 250,
+      bidder: {
+        id: 18,
+        displayName: 'Winning Bidder',
+      },
+    };
+
+    auctionsRepo.find.mockResolvedValue([
+      buildAuction({
+        status: AuctionStatus.Active,
+        endsAt: new Date('2020-01-01T00:00:00.000Z'),
+        currentHighBid: winningBid as Auction['currentHighBid'],
+      }),
+    ]);
+    auctionsRepo.save.mockImplementation(async (auction: Auction) => auction);
+    notificationsRepo.create.mockImplementation((payload) => payload);
+    notificationsRepo.save.mockResolvedValue(undefined);
+
+    await service.settleExpiredAuctions();
+
+    expect(auctionsRepo.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        status: AuctionStatus.Ended,
+        winningBid,
+      }),
+    );
+    expect(notificationsRepo.save).toHaveBeenCalled();
   });
 });
