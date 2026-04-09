@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateMessageDto } from './dto/create-message.dto';
+import { CreateMessageDto } from './types/create-message.dto';
 
 @Injectable()
 export class MessagesService {

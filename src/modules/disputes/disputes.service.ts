@@ -1,22 +1,12 @@
+import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
-import { CreateDisputeDto } from './dto/create-dispute.dto';
+import { Dispute } from 'src/database/entities';
+import { InjectRepository } from '@nestjs/typeorm';
+import { TypeOrmCrudService } from '@nestjsx/crud-typeorm';
 
 @Injectable()
-export class DisputesService {
-  /**
-   * Stub: disputes raised by or visible to the user.
-   * @returns { { items: unknown[] } }
-   */
-  findMine(): { items: unknown[] } {
-    return { items: [] };
-  }
-
-  /**
-   * Stub: open a new dispute.
-   * @param { CreateDisputeDto } dto - Dispute payload.
-   * @returns { { message: string; id: string } }
-   */
-  create(dto: CreateDisputeDto): { message: string; id: string } {
-    return { message: 'TODO: persist dispute and notify admins', id: 'stub-dispute-id' };
+export class DisputesService extends TypeOrmCrudService<Dispute> {
+  constructor(@InjectRepository(Dispute) public repo: Repository<Dispute>) {
+    super(repo);
   }
 }

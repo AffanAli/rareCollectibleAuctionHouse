@@ -4,35 +4,35 @@
 2. User login
    As a registered user, I want to log in to the platform so that I can access my profile, place bids, manage my auctions, and view my notifications and messages.
 
-3. View available auctions
-   As a logged-in user, I want to view a list of available auctions so that I can discover collectibles I am interested in and decide where to bid.
-
-4. View auction details
-   As a guest / visitor, I want to view full details of an auction (item description, current bid, end time, seller info) so that I can make an informed decision before placing a bid.
-
-5. Place a bid on an auction
-   As an authorized user, I want to place a bid on an auction so that I can compete to win the collectible and have my bid recorded fairly.
-
-6. View my bids
-   As an authorized user, I want to view all my bids across auctions so that I can track my activity and see which items I am currently winning or have lost.
-
-7. View my profile
+3. View my profile
    As an authorized user, I want to view and manage my profile (contact details, preferences) so that my identity and settings are correct for other users and for the platform.
 
-8. View my auction history
+4. Admin login and view platform data
+   As an administrator, I want to log in and view all users, auctions, bids, messages, notifications, disputes, and payments so that I can monitor platform health and enforce policies.
+
+5. View available auctions
+   As a logged-in user, I want to view a list of available auctions so that I can discover collectibles I am interested in and decide where to bid.
+
+6. View auction details
+   As a guest / visitor, I want to view full details of an auction (item description, current bid, end time, seller info) so that I can make an informed decision before placing a bid.
+
+7. View my auction history
    As an authorized user, I want to view my auction history (items won, sold, or lost) so that I can review my past activity and outcomes.
 
-9. View auction notifications
-   As an authorized user, I want to view my auction-related notifications (e.g. outbid, auction won, auction ended) so that I stay informed without having to check each auction manually.
+8. Place a bid on an auction
+   As an authorized user, I want to place a bid on an auction so that I can compete to win the collectible and have my bid recorded fairly.
 
-10. View and send auction messages
+9. View my bids
+   As an authorized user, I want to view all my bids across auctions so that I can track my activity and see which items I am currently winning or have lost.
+
+10. View auction notifications
+    As an authorized user, I want to view my auction-related notifications (e.g. outbid, auction won, auction ended) so that I stay informed without having to check each auction manually.
+
+11. View and send auction messages
     As an authorized user, I want to view and send messages related to my auctions (e.g. with buyers/sellers) so that I can communicate about delivery, condition, or payment.
 
-11. Raise a dispute
+12. Raise a dispute
     As an authorized user, I want to raise a dispute when an auction or transaction is not going as expected so that the platform or admin can help resolve the issue fairly.
-
-12. Admin login and view platform data
-    As an administrator, I want to log in and view all users, auctions, bids, messages, notifications, disputes, and payments so that I can monitor platform health and enforce policies.
 
 13. Resolve disputes
     As an administrator, I want to review and resolve user disputes so that conflicts are handled fairly and trust in the platform is maintained.

@@ -1,36 +1,61 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
-import { CreateDisputeDto } from './dto/create-dispute.dto';
+import * as crud from '@nestjsx/crud';
+import { Controller, UseGuards } from '@nestjs/common';
 import { DisputesService } from './disputes.service';
+import { Dispute } from 'src/database/entities';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+import { UserRole } from 'src/database/enums/user-role.enum';
+import { Roles } from 'src/modules/utils/decorators/roles.decorator';
+import { JwtAuthGuard } from 'src/modules/utils/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/modules/utils/guards/roles.guard';
+import { CreateDisputeDto, UpdateDisputeDto } from './types/dispute.dto';
 
+@crud.Crud({
+  model: { type: Dispute },
+  dto: {
+    create: CreateDisputeDto,
+    update: UpdateDisputeDto,
+  },
+  routes: {
+    exclude: ['replaceOneBase', 'deleteOneBase', 'createManyBase'],
+  },
+})
+@ApiTags('Disputes')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(UserRole.User, UserRole.Admin)
 @Controller('disputes')
 export class DisputesController {
-  constructor(private readonly disputesService: DisputesService) {}
+  constructor(readonly service: DisputesService) {}
 
-  /**
-   * Smoke test for the disputes module.
-   * @returns { { ok: boolean; scope: string } }
-   */
-  @Get('test')
-  getTest(): { ok: boolean; scope: string } {
-    return { ok: true, scope: 'disputes' };
+  get base(): crud.CrudController<Dispute> {
+    return this;
   }
 
-  /**
-   * List disputes for the current user (stub).
-   * @returns { { items: unknown[] } }
-   */
-  @Get()
-  findMine(): { items: unknown[] } {
-    return this.disputesService.findMine();
+  @crud.Override('getOneBase')
+  getOne(@crud.ParsedRequest() req: crud.CrudRequest) {
+    return this.base?.getOneBase?.(req);
   }
 
-  /**
-   * Raise a dispute (stub).
-   * @param { CreateDisputeDto } dto - Body.
-   * @returns { { message: string; id: string } }
-   */
-  @Post()
-  create(@Body() dto: CreateDisputeDto): { message: string; id: string } {
-    return this.disputesService.create(dto);
+  @crud.Override('getManyBase')
+  getMany(@crud.ParsedRequest() req: crud.CrudRequest) {
+    return this.base?.getManyBase?.(req);
+  }
+
+  @crud.Override('createOneBase')
+  async createOne(
+    @crud.ParsedRequest() req: crud.CrudRequest,
+    @crud.ParsedBody() dto: CreateDisputeDto,
+  ) {
+    return this.base?.createOneBase?.(req, {
+      ...dto,
+    } as unknown as Dispute);
+  }
+
+  @crud.Override('updateOneBase')
+  updateOne(
+    @crud.ParsedRequest() req: crud.CrudRequest,
+    @crud.ParsedBody() dto: UpdateDisputeDto,
+  ) {
+    return this.base?.updateOneBase?.(req, dto as unknown as Dispute);
   }
 }

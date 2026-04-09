@@ -5,16 +5,17 @@ import { AuctionsService } from './auctions.service';
 import { Controller, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/modules/utils/guards/jwt-auth.guard';
-import {
-  CreateAuctionDto,
-  UpdateAuctionDto,
-} from 'src/modules/auctions/dto/create-auction.dto';
+import { CreateAuctionDto, UpdateAuctionDto } from './types/create-auction.dto';
 import { UserRole } from 'src/database/enums/user-role.enum';
 import { Roles } from 'src/modules/utils/decorators/roles.decorator';
 import { RolesGuard } from 'src/modules/utils/guards/roles.guard';
 
 @crud.Crud({
   model: { type: Auction },
+  dto: {
+    create: CreateAuctionDto,
+    update: UpdateAuctionDto,
+  },
   routes: {
     exclude: ['replaceOneBase', 'deleteOneBase', 'createManyBase'],
   },
@@ -33,7 +34,10 @@ export class AuctionsController {
 
   @crud.Override('getOneBase')
   getOne(@crud.ParsedRequest() req: crud.CrudRequest) {
-    return this.base?.getOneBase?.(req);
+    return this.service.repo.findOne({
+      where: { id: req.parsed.paramsFilter[0].value },
+      relations: ['seller', 'images', 'bids'],
+    });
   }
 
   @crud.Override('createOneBase')

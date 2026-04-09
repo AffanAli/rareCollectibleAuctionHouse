@@ -9,4 +9,11 @@ export class AuctionsService extends TypeOrmCrudService<Auction> {
   constructor(@InjectRepository(Auction) public repo: Repository<Auction>) {
     super(repo);
   }
+
+  // getOne(req: CrudRequest) {
+  //   return this.repo.findOne({
+  //     where: { id: req.parsed.paramsFilter[0].value },
+  //     relations: ['seller', 'images', 'bids'],
+  //   });
+  // }
 }

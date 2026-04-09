@@ -2,14 +2,15 @@ import { PartialType } from '@nestjs/swagger';
 import {
   IsDateString,
   IsNumber,
+  IsObject,
   IsOptional,
   IsString,
   MinLength,
 } from 'class-validator';
 
 export class CreateAuctionDto {
-  @IsNumber()
-  sellerId: number;
+  @IsObject()
+  seller: Record<string, number>;
 
   @IsString()
   @MinLength(3)
@@ -22,7 +23,6 @@ export class CreateAuctionDto {
   @IsDateString()
   startsAt?: string;
 
-  @IsOptional()
   @IsDateString()
   endsAt?: string;
 
