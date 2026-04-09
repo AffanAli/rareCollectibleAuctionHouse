@@ -1,6 +1,9 @@
+version: '3.9'
+
 services:
   postgres:
     image: postgres:16-alpine
+    container_name: auction_postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -9,6 +12,25 @@ services:
       - '5432:5432'
     volumes:
       - auction_pg_data:/var/lib/postgresql/data
+
+  backend:
+    build: .
+    container_name: auction_backend
+    ports:
+      - '3000:3000'
+    environment:
+      PORT: 3000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: auction_house
+      CHOKIDAR_USEPOLLING: true
+    depends_on:
+      - postgres
+    volumes:
+      - .:/app
+      - /app/node_modules
 
 volumes:
   auction_pg_data:
