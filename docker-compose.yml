@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   postgres:
     image: postgres:16-alpine
@@ -25,6 +23,8 @@ services:
       DB_USER: postgres
       DB_PASSWORD: postgres
       DB_NAME: auction_house
+      DB_MIGRATIONS_RUN: true
+      DB_LOGGING: true
       CHOKIDAR_USEPOLLING: true
     depends_on:
       - postgres
