@@ -19,8 +19,10 @@ export class AuctionsUiService {
               and structured pricing information in one polished browsing experience.
             </p>
             <div class="hero-actions">
-              <a class="button button-primary" href="/seller/auctions/new">Create a listing</a>
-              <a class="button button-secondary" href="/login">Log in to manage auctions</a>
+              <a class="button button-primary guest-only-cta" href="/register">Create an account to sell</a>
+              <a class="button button-secondary guest-only-cta" href="/login">Log in to manage auctions</a>
+              <a class="button button-primary user-only-cta" href="/seller/auctions/new" style="display: none;">Create a listing</a>
+              <a class="button button-secondary user-only-cta" href="/seller/auctions" style="display: none;">Manage my auctions</a>
             </div>
             <div class="hero-foot">
               <span class="chip">Search by keyword</span>
@@ -97,6 +99,18 @@ export class AuctionsUiService {
         const emptyState = document.getElementById('empty-state');
         const summary = document.getElementById('results-summary');
         const resetButton = document.getElementById('reset-filters');
+        const token = localStorage.getItem('auctionHouseToken');
+        const guestOnlyCtas = document.querySelectorAll('.guest-only-cta');
+        const userOnlyCtas = document.querySelectorAll('.user-only-cta');
+
+        if (token) {
+          guestOnlyCtas.forEach((element) => {
+            element.style.display = 'none';
+          });
+          userOnlyCtas.forEach((element) => {
+            element.style.display = '';
+          });
+        }
 
         const formatMoney = (value) =>
           new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(Number(value || 0));

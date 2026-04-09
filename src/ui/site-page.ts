@@ -85,13 +85,13 @@ export function renderSitePage({
       }
 
       .shell {
-        width: min(1180px, calc(100vw - 32px));
+        width: min(1380px, calc(100vw - 40px));
         margin: 0 auto;
         padding: 24px 0 72px;
       }
 
       .form-shell {
-        width: min(760px, calc(100vw - 32px));
+        width: min(980px, calc(100vw - 40px));
         margin: 0 auto;
         padding: 24px 0 72px;
       }
@@ -104,7 +104,7 @@ export function renderSitePage({
         justify-content: space-between;
         align-items: center;
         gap: 16px;
-        padding: 14px 18px;
+        padding: 14px 20px;
         margin-bottom: 28px;
         border: 1px solid var(--line);
         border-radius: 999px;
@@ -117,6 +117,7 @@ export function renderSitePage({
         display: flex;
         align-items: center;
         gap: 12px;
+        flex-shrink: 0;
         font-weight: 700;
         letter-spacing: 0.01em;
       }
@@ -142,6 +143,16 @@ export function renderSitePage({
         align-items: center;
         gap: 10px;
         flex-wrap: wrap;
+      }
+
+      .nav-links {
+        flex: 1 1 auto;
+        justify-content: center;
+      }
+
+      .nav-actions {
+        flex-shrink: 0;
+        justify-content: flex-end;
       }
 
       .nav-link,
@@ -214,6 +225,12 @@ export function renderSitePage({
       .account-menu {
         position: relative;
         justify-content: flex-end;
+      }
+
+      .dropdown-divider {
+        height: 1px;
+        margin: 8px 0;
+        background: rgba(95, 108, 123, 0.12);
       }
 
       .notification-menu {
@@ -564,7 +581,7 @@ export function renderSitePage({
 
       .section-title p,
       .muted {
-        max-width: 56ch;
+        max-width: 66ch;
         color: var(--muted);
         line-height: 1.6;
       }
@@ -779,7 +796,7 @@ export function renderSitePage({
         .nav {
           border-radius: 28px;
           flex-wrap: wrap;
-          justify-content: center;
+          justify-content: space-between;
         }
 
         .nav-links,
@@ -796,7 +813,7 @@ export function renderSitePage({
       @media (max-width: 640px) {
         .shell,
         .form-shell {
-          width: min(100vw - 20px, 100%);
+          width: min(100vw - 24px, 100%);
         }
 
         .hero,
@@ -826,18 +843,12 @@ export function renderSitePage({
       <nav class="nav reveal">
         <a class="brand" href="/">
           <span class="brand-mark">RC</span>
-          <span>Rare Collectible Auction House</span>
+          <span>Rare Collectibles</span>
         </a>
         <div class="nav-links">
           <a class="nav-link${activePath === '/' ? ' active' : ''}" href="/">Home</a>
           <a class="nav-link${activePath === '/marketplace' ? ' active' : ''}" href="/marketplace">Marketplace</a>
-          <a class="nav-link${activePath === '/profile' ? ' active' : ''}" href="/profile">Profile</a>
-          <a class="nav-link${activePath === '/bids' ? ' active' : ''}" href="/bids">My bids</a>
-          <a class="nav-link${activePath === '/messages' ? ' active' : ''}" href="/messages">Messages</a>
-          <a class="nav-link${activePath === '/notifications' ? ' active' : ''}" href="/notifications/page">Notifications</a>
-          <a class="nav-link user-only${activePath === '/disputes' ? ' active' : ''}" href="/disputes" style="display: none;">Disputes</a>
           <a class="nav-link${activePath === '/seller/auctions' || activePath === '/seller/auctions/new' ? ' active' : ''}" href="/seller/auctions">Sell</a>
-          <a class="nav-link user-only admin-only${activePath === '/admin/dashboard' ? ' active' : ''}" href="/admin/dashboard" style="display: none;">Admin</a>
           <a class="nav-link guest-only${activePath === '/login' ? ' active' : ''}" href="/login">Login</a>
           <a class="nav-link guest-only${activePath === '/register' ? ' active' : ''}" href="/register">Register</a>
           <a class="nav-link" href="/api">API Docs</a>
@@ -882,11 +893,13 @@ export function renderSitePage({
               </div>
               <div class="dropdown-items" role="menu" aria-label="Account menu">
                 <a class="dropdown-item" href="/profile" role="menuitem">Profile</a>
+                <a class="dropdown-item" href="/seller/auctions" role="menuitem">My auctions</a>
+                <div class="dropdown-divider" aria-hidden="true"></div>
                 <a class="dropdown-item" href="/bids" role="menuitem">My bids</a>
                 <a class="dropdown-item" href="/messages" role="menuitem">Messages</a>
                 <a class="dropdown-item" href="/notifications/page" role="menuitem">Notifications</a>
                 <a class="dropdown-item" href="/disputes" role="menuitem">Disputes</a>
-                <a class="dropdown-item" href="/seller/auctions" role="menuitem">My auctions</a>
+                <div class="dropdown-divider" aria-hidden="true"></div>
                 <a class="dropdown-item admin-only" href="/admin/dashboard" role="menuitem" style="display: none;">Admin dashboard</a>
                 <button class="dropdown-item" id="logout-button" type="button" role="menuitem">Log out</button>
               </div>

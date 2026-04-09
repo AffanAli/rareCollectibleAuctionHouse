@@ -20,7 +20,8 @@ export class AppService {
               and built-in dispute resolution.
             </p>
             <div class="hero-actions">
-              <a class="button button-primary" href="/register">Create your account</a>
+              <a class="button button-primary guest-only-cta" href="/register">Create your account</a>
+              <a class="button button-primary user-only-cta" href="/seller/auctions/new" style="display: none;">Create a listing</a>
               <a class="button button-secondary" href="/marketplace">Explore the marketplace</a>
             </div>
             <div class="hero-foot">
@@ -158,13 +159,29 @@ export class AppService {
             </p>
           </div>
           <div class="hero-actions" style="margin-top: 22px;">
-            <a class="button button-primary" href="/register">Register now</a>
-            <a class="button button-secondary" href="/seller/auctions">Manage auctions</a>
+            <a class="button button-primary guest-only-cta" href="/register">Register now</a>
+            <a class="button button-primary user-only-cta" href="/seller/auctions" style="display: none;">Manage auctions</a>
+            <a class="button button-secondary guest-only-cta" href="/login">Log in</a>
+            <a class="button button-secondary user-only-cta" href="/profile" style="display: none;">Open profile</a>
           </div>
         </section>
 
         <p class="footer reveal delay-4">Public homepage for the Rare Collectible Auction House platform.</p>
-      </main>`,
+      </main>
+      <script>
+        const token = localStorage.getItem('auctionHouseToken');
+        const guestOnlyCtas = document.querySelectorAll('.guest-only-cta');
+        const userOnlyCtas = document.querySelectorAll('.user-only-cta');
+
+        if (token) {
+          guestOnlyCtas.forEach((element) => {
+            element.style.display = 'none';
+          });
+          userOnlyCtas.forEach((element) => {
+            element.style.display = '';
+          });
+        }
+      </script>`,
     });
   }
 
@@ -205,6 +222,11 @@ export class AppService {
         </section>
       </main>
       <script>
+        const existingToken = localStorage.getItem('auctionHouseToken');
+        if (existingToken) {
+          window.location.replace('/seller/auctions');
+        }
+
         const form = document.getElementById('login-form');
         const status = document.getElementById('status');
 
@@ -289,6 +311,11 @@ export class AppService {
         </section>
       </main>
       <script>
+        const existingToken = localStorage.getItem('auctionHouseToken');
+        if (existingToken) {
+          window.location.replace('/seller/auctions');
+        }
+
         const form = document.getElementById('register-form');
         const status = document.getElementById('status');
 
