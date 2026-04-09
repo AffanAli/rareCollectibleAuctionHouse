@@ -38,3 +38,19 @@ export class CreateUserDto {
 }
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {}
+
+export class UpdateProfileDto {
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  displayName?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(64)
+  contactPhone?: string;
+
+  @IsOptional()
+  @IsObject()
+  preferencesJson?: Record<string, unknown>;
+}

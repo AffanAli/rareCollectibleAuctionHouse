@@ -3,6 +3,7 @@ export type SitePagePath =
   | '/login'
   | '/register'
   | '/marketplace'
+  | '/profile'
   | '/seller/auctions'
   | '/seller/auctions/new';
 
@@ -628,6 +629,7 @@ export function renderSitePage({
         <div class="nav-links">
           <a class="nav-link${activePath === '/' ? ' active' : ''}" href="/">Home</a>
           <a class="nav-link${activePath === '/marketplace' ? ' active' : ''}" href="/marketplace">Marketplace</a>
+          <a class="nav-link${activePath === '/profile' ? ' active' : ''}" href="/profile">Profile</a>
           <a class="nav-link${activePath === '/seller/auctions' || activePath === '/seller/auctions/new' ? ' active' : ''}" href="/seller/auctions">Sell</a>
           <a class="nav-link${activePath === '/login' ? ' active' : ''}" href="/login">Login</a>
           <a class="nav-link${activePath === '/register' ? ' active' : ''}" href="/register">Register</a>
