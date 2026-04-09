@@ -87,7 +87,7 @@ export function renderSitePage({
       .shell {
         width: min(1380px, calc(100vw - 40px));
         margin: 0 auto;
-        padding: 24px 0 72px;
+        padding: 12px 0 48px;
       }
 
       .form-shell {
@@ -104,8 +104,8 @@ export function renderSitePage({
         justify-content: space-between;
         align-items: center;
         gap: 16px;
-        padding: 14px 20px;
-        margin-bottom: 28px;
+        padding: 12px 18px;
+        margin-bottom: 20px;
         border: 1px solid var(--line);
         border-radius: 999px;
         background: rgba(255, 249, 241, 0.8);
@@ -441,8 +441,8 @@ export function renderSitePage({
       .hero {
         display: grid;
         grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
-        gap: 24px;
-        padding: 28px;
+        gap: 20px;
+        padding: 24px;
         border-radius: var(--radius-xl);
         overflow: hidden;
       }
@@ -478,26 +478,27 @@ export function renderSitePage({
       }
 
       h1 {
-        margin-top: 18px;
-        font-size: clamp(2.4rem, 6vw, 4.8rem);
-        line-height: 0.97;
-        letter-spacing: -0.04em;
+        margin-top: 12px;
+        font-size: clamp(2rem, 5vw, 3.8rem);
+        line-height: 1;
+        letter-spacing: -0.03em;
       }
 
       .hero p,
       .lead {
-        margin-top: 18px;
+        margin-top: 12px;
         max-width: 61ch;
         color: var(--muted);
-        font-size: 1.06rem;
-        line-height: 1.7;
+        font-size: 1rem;
+        line-height: 1.6;
       }
 
       .hero-foot {
         display: flex;
         flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 26px;
+        gap: 8px;
+        margin-top: 16px;
+        display: none;
       }
 
       .chip {
@@ -545,11 +546,11 @@ export function renderSitePage({
       .highlight-list,
       .grid {
         display: grid;
-        gap: 18px;
+        gap: 14px;
       }
 
       .grid {
-        margin-top: 22px;
+        margin-top: 14px;
       }
 
       .grid-3 {
@@ -567,7 +568,7 @@ export function renderSitePage({
       .table-card,
       .empty-state {
         border-radius: var(--radius-lg);
-        padding: 22px;
+        padding: 18px;
       }
 
       .section-title {
@@ -575,8 +576,8 @@ export function renderSitePage({
         justify-content: space-between;
         align-items: end;
         gap: 16px;
-        margin-top: 38px;
-        margin-bottom: 14px;
+        margin-top: 24px;
+        margin-bottom: 10px;
       }
 
       .section-title p,
@@ -759,10 +760,97 @@ export function renderSitePage({
       }
 
       .footer {
-        margin-top: 38px;
-        padding: 22px 0 0;
+        margin-top: 24px;
+        padding: 16px 0 0;
         color: var(--muted);
         text-align: center;
+        font-size: 0.9rem;
+        display: none;
+      }
+
+      .site-footer {
+        margin-top: 48px;
+        padding: 40px 0 20px;
+        border-top: 1px solid var(--line);
+        background: rgba(245, 240, 233, 0.5);
+      }
+
+      .footer-content {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 28px;
+        padding-bottom: 28px;
+      }
+
+      .footer-section h4 {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--text);
+        margin: 0 0 12px 0;
+      }
+
+      .footer-section ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: grid;
+        gap: 8px;
+      }
+
+      .footer-section a {
+        color: var(--muted);
+        font-size: 0.9rem;
+        transition: color 180ms ease;
+      }
+
+      .footer-section a:hover {
+        color: var(--brand);
+      }
+
+      .footer-bottom {
+        text-align: center;
+        padding-top: 20px;
+        border-top: 1px solid rgba(92, 70, 44, 0.1);
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+
+      .footer-bottom a {
+        color: var(--muted);
+        transition: color 180ms ease;
+      }
+
+      .footer-bottom a:hover {
+        color: var(--brand);
+      }
+
+      .stats-row {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .stat-box {
+        border: 1px solid var(--line);
+        background: var(--surface);
+        backdrop-filter: blur(18px);
+        box-shadow: var(--shadow);
+        border-radius: var(--radius-lg);
+        padding: 20px;
+        text-align: center;
+      }
+
+      .stat-number {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: var(--brand-dark);
+        margin-bottom: 6px;
+      }
+
+      .stat-label {
+        font-size: 0.9rem;
+        color: var(--muted);
+        font-weight: 500;
       }
 
       .reveal {
@@ -789,7 +877,9 @@ export function renderSitePage({
         .grid-2,
         .field-grid,
         .field-grid-3,
-        .list-grid {
+        .list-grid,
+        .stats-row,
+        .footer-content {
           grid-template-columns: 1fr;
         }
 
@@ -915,6 +1005,8 @@ export function renderSitePage({
         const guestOnly = document.querySelectorAll('.guest-only');
         const userOnly = document.querySelectorAll('.user-only');
         const adminOnly = document.querySelectorAll('.admin-only');
+        const guestOnlyFooter = document.querySelectorAll('.guest-only-footer');
+        const userOnlyFooter = document.querySelectorAll('.user-only-footer');
         const logoutButton = document.getElementById('logout-button');
         const accountTrigger = document.getElementById('account-trigger');
         const accountDropdown = document.getElementById('account-dropdown');
@@ -941,6 +1033,12 @@ export function renderSitePage({
           adminOnly.forEach((element) => {
             element.style.display = 'none';
           });
+          guestOnlyFooter.forEach((element) => {
+            element.style.display = '';
+          });
+          userOnlyFooter.forEach((element) => {
+            element.style.display = 'none';
+          });
         };
 
         const setLoggedInNav = (label = 'My account', isAdmin = false) => {
@@ -952,6 +1050,12 @@ export function renderSitePage({
           });
           adminOnly.forEach((element) => {
             element.style.display = isAdmin ? '' : 'none';
+          });
+          guestOnlyFooter.forEach((element) => {
+            element.style.display = 'none';
+          });
+          userOnlyFooter.forEach((element) => {
+            element.style.display = '';
           });
 
           const trimmed = String(label || 'My account').trim();

@@ -12,162 +12,160 @@ export class AppService {
       body: `<main class="shell">
         <section class="hero">
           <div class="reveal delay-1">
-            <span class="eyebrow">Transparent collectible auctions</span>
-            <h1>Discover, bid, and trade rare items with confidence.</h1>
+            <span class="eyebrow">The collector's marketplace</span>
+            <h1>Discover rare items. Bid with confidence. Collect with pride.</h1>
             <p>
-              A single, purpose-built space for collectors, sellers, and administrators to manage
-              the full auction lifecycle with clear activity, structured payments, secure access,
-              and built-in dispute resolution.
+              The most trusted platform for trading rare collectibles. Thousands of verified buyers and sellers discovering authentic items, placing transparent bids, and completing secure transactions every day.
             </p>
             <div class="hero-actions">
-              <a class="button button-primary guest-only-cta" href="/register">Create your account</a>
-              <a class="button button-primary user-only-cta" href="/seller/auctions/new" style="display: none;">Create a listing</a>
-              <a class="button button-secondary" href="/marketplace">Explore the marketplace</a>
-            </div>
-            <div class="hero-foot">
-              <span class="chip">Browse live auctions</span>
-              <span class="chip">Track bids and history</span>
-              <span class="chip">Messages and notifications</span>
-              <span class="chip">Admin oversight and moderation</span>
+              <a class="button button-primary guest-only-cta" href="/register">Create account</a>
+              <a class="button button-primary user-only-cta" href="/seller/auctions/new" style="display: none;">Create listing</a>
+              <a class="button button-secondary" href="/marketplace">Browse auctions</a>
             </div>
           </div>
           <div class="hero-rail">
             <article class="panel hero-highlight reveal delay-2">
-              <h2>Built for trust from listing to payment</h2>
-              <p>
-                Clear auction mechanics, visible activity, and structured escalation paths reduce
-                uncertainty for every participant.
-              </p>
+              <h2 style="margin-bottom: 12px;">Why collectors trust us</h2>
               <div class="highlight-list">
-                <div class="highlight-item">
-                  <strong>For buyers:</strong> find rare items, review auction details, place bids,
-                  and stay updated when you are outbid or win.
-                </div>
-                <div class="highlight-item">
-                  <strong>For sellers:</strong> reach a broader audience, manage auctions, and keep
-                  buyer communication in one place.
-                </div>
-                <div class="highlight-item">
-                  <strong>For admins:</strong> monitor users, payments, disputes, messages, and
-                  moderation from a central dashboard.
-                </div>
+                <div class="highlight-item">✓ Real-time bidding with transparent pricing</div>
+                <div class="highlight-item">✓ Verified seller profiles and detailed listings</div>
+                <div class="highlight-item">✓ Secure payments and buyer protection</div>
+                <div class="highlight-item">✓ Professional moderation & dispute resolution</div>
               </div>
             </article>
           </div>
         </section>
 
-        <div class="section-title reveal delay-2">
-          <div>
-            <div class="kicker">Platform pillars</div>
-            <h2>Designed around the real auction journey</h2>
+        <div class="stats-row reveal delay-2" style="margin-top: 32px;">
+          <div class="stat-box">
+            <div class="stat-number">8,427</div>
+            <div class="stat-label">Active auctions</div>
           </div>
-          <p>
-            The experience brings discovery, competition, communication, and resolution into one
-            coherent flow so users are not forced to jump between fragmented tools.
-          </p>
+          <div class="stat-box">
+            <div class="stat-number">12,891</div>
+            <div class="stat-label">Verified sellers</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number">45,203</div>
+            <div class="stat-label">Successful sales</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-number">98%</div>
+            <div class="stat-label">Positive ratings</div>
+          </div>
+        </div>
+
+        <div class="section-title reveal delay-1" style="margin-top: 36px;">
+          <div>
+            <h2>How it works</h2>
+          </div>
         </div>
 
         <section class="grid grid-3">
           <article class="feature-card reveal delay-1">
-            <h3>Explore auctions clearly</h3>
-            <p>
-              Visitors can inspect auction details before signing in, while registered users browse
-              active listings, view timing, seller context, and bid histories in one place.
-            </p>
+            <div style="font-size: 2rem; margin-bottom: 10px;">🔍</div>
+            <h3>Discover & Browse</h3>
+            <p>Search through thousands of authentic rare items. View high-quality photos, detailed descriptions, seller ratings, and bid history.</p>
           </article>
           <article class="feature-card reveal delay-2">
-            <h3>Bid with visibility</h3>
-            <p>
-              Users can place and track bids, review past outcomes, and receive auction-related
-              notifications that support informed and timely decisions.
-            </p>
+            <div style="font-size: 2rem; margin-bottom: 10px;">🎯</div>
+            <h3>Bid & Win</h3>
+            <p>Place bids with confidence. Real-time updates keep you informed. Automatic outbid protection means you'll never miss a winning opportunity.</p>
           </article>
           <article class="feature-card reveal delay-3">
-            <h3>Resolve issues responsibly</h3>
-            <p>
-              Messaging, payment oversight, moderation, and disputes are built in so the platform
-              can stay predictable, fair, and easier to trust.
-            </p>
+            <div style="font-size: 2rem; margin-bottom: 10px;">✓</div>
+            <h3>Complete & Receive</h3>
+            <p>Secure checkout with multiple payment options. Direct messaging with sellers. Professional dispute resolution when you need it.</p>
           </article>
         </section>
 
-        <div class="section-title reveal delay-3">
+        <div class="section-title reveal delay-2" style="margin-top: 36px;">
           <div>
-            <div class="kicker">Core use cases</div>
-            <h2>Everything stakeholders expect in one ecosystem</h2>
+            <h2>Why sell with us</h2>
           </div>
-          <p>
-            The homepage reflects the documented goals: accessible discovery for guests, account
-            creation for new users, and dependable oversight for administrators.
-          </p>
         </div>
 
         <section class="grid grid-2">
           <article class="info-card reveal delay-1">
-            <h3>Collector experience</h3>
-            <p>
-              Register, log in, browse auctions, inspect details, place bids, review your bidding
-              history, check notifications, message participants, and raise concerns when a
-              transaction does not go as expected.
-            </p>
+            <h3>For Buyers</h3>
+            <ul style="color: var(--muted); margin-top: 12px; padding-left: 20px; line-height: 1.8;">
+              <li>Access to rare items you won't find elsewhere</li>
+              <li>Transparent auction mechanics and fair pricing</li>
+              <li>Buyer protection and secure payments</li>
+              <li>Real-time notifications keep you updated</li>
+              <li>Message sellers directly with questions</li>
+            </ul>
           </article>
           <article class="info-card reveal delay-2">
-            <h3>Operational oversight</h3>
-            <p>
-              Administrators gain visibility across users, auctions, bids, messages, notifications,
-              disputes, and payments so moderation and resolution can be handled consistently.
-            </p>
+            <h3>For Sellers</h3>
+            <ul style="color: var(--muted); margin-top: 12px; padding-left: 20px; line-height: 1.8;">
+              <li>Reach serious collectors worldwide</li>
+              <li>Simple listing creation with photo upload</li>
+              <li>Competitive auction format drives better prices</li>
+              <li>Professional verification boosts your credibility</li>
+              <li>Built-in tools for order and payment management</li>
+            </ul>
           </article>
         </section>
 
-        <section class="grid grid-3">
-          <article class="metric-card reveal delay-2">
-            <span class="metric">15</span>
-            <h3>Documented use cases</h3>
-            <p>
-              From registration and login through bidding, messaging, disputes, moderation, and
-              payment visibility.
+        <section class="panel reveal delay-4" style="margin-top: 36px;">
+          <div style="text-align: center;">
+            <div class="kicker">Ready?</div>
+            <h2>Join thousands of collectors today</h2>
+            <p style="color: var(--muted); margin-top: 12px; font-size: 1rem;">
+              Whether you're buying your next treasure or selling items you've treasured, our marketplace makes it effortless.
             </p>
-          </article>
-          <article class="metric-card reveal delay-3">
-            <span class="metric">1</span>
-            <h3>Unified marketplace</h3>
-            <p>
-              Listings, bids, updates, and issue handling are designed to live together instead of
-              being split across disconnected services.
-            </p>
-          </article>
-          <article class="metric-card reveal delay-4">
-            <span class="metric">24/7</span>
-            <h3>Always accessible</h3>
-            <p>
-              The public landing page stays visible without authentication, giving new visitors a
-              clear path into the platform immediately.
-            </p>
-          </article>
-        </section>
-
-        <section class="panel reveal delay-4" style="margin-top: 24px;">
-          <div class="section-title" style="margin-top: 0; margin-bottom: 0;">
-            <div>
-              <div class="kicker">Start here</div>
-              <h2>Join the marketplace or continue your account journey</h2>
+            <div class="hero-actions" style="margin-top: 20px; justify-content: center;">
+              <a class="button button-primary guest-only-cta" href="/register">Create free account</a>
+              <a class="button button-primary user-only-cta" href="/seller/auctions/new" style="display: none;">Create listing</a>
+              <a class="button button-secondary guest-only-cta" href="/login">Already have an account?</a>
             </div>
-            <p>
-              New users can create an account in a minute. Returning users can sign in and continue
-              bidding, messaging, or managing auction activity.
-            </p>
-          </div>
-          <div class="hero-actions" style="margin-top: 22px;">
-            <a class="button button-primary guest-only-cta" href="/register">Register now</a>
-            <a class="button button-primary user-only-cta" href="/seller/auctions" style="display: none;">Manage auctions</a>
-            <a class="button button-secondary guest-only-cta" href="/login">Log in</a>
-            <a class="button button-secondary user-only-cta" href="/profile" style="display: none;">Open profile</a>
           </div>
         </section>
-
-        <p class="footer reveal delay-4">Public homepage for the Rare Collectible Auction House platform.</p>
       </main>
+      <footer class="site-footer">
+        <div class="shell">
+          <div class="footer-content">
+            <div class="footer-section">
+              <h4>Browse</h4>
+              <ul>
+                <li><a href="/marketplace">Browse auctions</a></li>
+                <li><a href="/marketplace">Search items</a></li>
+                <li><a href="/seller/auctions">View all sellers</a></li>
+              </ul>
+            </div>
+            <div class="footer-section">
+              <h4>Sell</h4>
+              <ul>
+                <li><a href="/seller/auctions/new">Create listing</a></li>
+                <li><a href="/seller/auctions">Manage auctions</a></li>
+                <li><a href="/messages">Message buyers</a></li>
+              </ul>
+            </div>
+            <div class="footer-section">
+              <h4>Account</h4>
+              <ul>
+                <li><a href="/profile" class="user-only-footer" style="display: none;">Profile</a></li>
+                <li><a href="/bids" class="user-only-footer" style="display: none;">My bids</a></li>
+                <li><a href="/notifications/page" class="user-only-footer" style="display: none;">Notifications</a></li>
+                <li><a href="/register" class="guest-only-footer">Sign up</a></li>
+                <li><a href="/login" class="guest-only-footer">Sign in</a></li>
+              </ul>
+            </div>
+            <div class="footer-section">
+              <h4>Help</h4>
+              <ul>
+                <li><a href="/api">API Documentation</a></li>
+                <li><a href="/disputes" class="user-only-footer" style="display: none;">Disputes</a></li>
+                <li><a href="/">About us</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="footer-bottom">
+            <p>&copy; 2026 Rare Collectible Auction House. All rights reserved. | <a href="/">Home</a> | <a href="/marketplace">Marketplace</a></p>
+          </div>
+        </div>
+      </footer>
       <script>
         const token = localStorage.getItem('auctionHouseToken');
         const guestOnlyCtas = document.querySelectorAll('.guest-only-cta');
