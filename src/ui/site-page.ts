@@ -948,7 +948,9 @@ export function renderSitePage({
           <a class="button button-primary guest-only" href="/register">Create account</a>
           <div class="notification-menu user-only" id="notification-menu" style="display: none;">
             <button class="notification-trigger" id="notification-trigger" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Open notifications">
-              <span>N</span>
+              <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path fill="currentColor" d="M12 22a2.2 2.2 0 0 0 2.12-1.66h-4.24A2.2 2.2 0 0 0 12 22Zm7-6V11a7 7 0 0 0-5-6.7V3.5a2 2 0 1 0-4 0v.8A7 7 0 0 0 5 11v5l-1.6 1.6a1 1 0 0 0 .7 1.7h15.8a1 1 0 0 0 .7-1.7L19 16Z"/>
+              </svg>
               <span class="notification-badge" id="notification-badge" style="display: none;">0</span>
             </button>
             <div class="notification-dropdown" id="notification-dropdown" hidden>
