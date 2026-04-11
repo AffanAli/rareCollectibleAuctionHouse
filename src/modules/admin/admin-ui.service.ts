@@ -56,12 +56,96 @@ export class AdminUiService {
             </aside>
             <div class="admin-main">
               <div id="admin-overview" class="admin-view">
-                <div class="grid grid-3" style="margin-bottom: 16px;">
-                  <article class="metric-card"><span id="metric-users" class="metric">0</span><h3>Users</h3></article>
-                  <article class="metric-card"><span id="metric-auctions" class="metric">0</span><h3>Auctions</h3></article>
-                  <article class="metric-card"><span id="metric-disputes" class="metric">0</span><h3>Disputes</h3></article>
+                <div class="overview-shell">
+                  <div class="overview-header">
+                    <div>
+                      <div class="kicker">At a glance</div>
+                      <h2 style="margin-top: 10px;">Marketplace pulse</h2>
+                      <p class="muted" id="admin-summary" style="margin-top: 10px;">Loading dashboard...</p>
+                    </div>
+                    <div class="overview-actions">
+                      <button class="button button-secondary button-sm" type="button" data-view="disputes">Review disputes</button>
+                      <button class="button button-ghost button-sm" type="button" data-view="payments">View payments</button>
+                    </div>
+                  </div>
+
+                  <div class="overview-kpis" aria-label="Key performance indicators">
+                    <article class="kpi-card">
+                      <div class="kpi-top">
+                        <span class="kpi-label">Users</span>
+                        <span class="kpi-pill" id="kpi-users-trend">All time</span>
+                      </div>
+                      <div class="kpi-value" id="metric-users">0</div>
+                      <div class="kpi-sub" id="kpi-users-sub">Active accounts</div>
+                    </article>
+
+                    <article class="kpi-card">
+                      <div class="kpi-top">
+                        <span class="kpi-label">Auctions</span>
+                        <span class="kpi-pill" id="kpi-auctions-active">0 active</span>
+                      </div>
+                      <div class="kpi-value" id="metric-auctions">0</div>
+                      <div class="kpi-sub" id="kpi-auctions-sub">Ended: 0, Draft/Cancelled: 0</div>
+                    </article>
+
+                    <article class="kpi-card">
+                      <div class="kpi-top">
+                        <span class="kpi-label">Disputes</span>
+                        <span class="kpi-pill warn" id="kpi-disputes-open">0 open</span>
+                      </div>
+                      <div class="kpi-value" id="metric-disputes">0</div>
+                      <div class="kpi-sub" id="kpi-disputes-sub">Resolved: 0</div>
+                    </article>
+
+                    <article class="kpi-card">
+                      <div class="kpi-top">
+                        <span class="kpi-label">Payments</span>
+                        <span class="kpi-pill" id="kpi-payments-pending">0 pending</span>
+                      </div>
+                      <div class="kpi-value" id="kpi-payments-total">0</div>
+                      <div class="kpi-sub" id="kpi-payments-sub">Recent ended-auction payments</div>
+                    </article>
+
+                    <article class="kpi-card">
+                      <div class="kpi-top">
+                        <span class="kpi-label">Notifications</span>
+                        <span class="kpi-pill" id="kpi-notifications-unread">0 unread</span>
+                      </div>
+                      <div class="kpi-value" id="kpi-notifications-total">0</div>
+                      <div class="kpi-sub">Across all users</div>
+                    </article>
+
+                    <article class="kpi-card">
+                      <div class="kpi-top">
+                        <span class="kpi-label">Messages</span>
+                        <span class="kpi-pill" id="kpi-messages-recent">Last 24h</span>
+                      </div>
+                      <div class="kpi-value" id="kpi-messages-total">0</div>
+                      <div class="kpi-sub" id="kpi-messages-sub">Buyer/seller comms</div>
+                    </article>
+                  </div>
+
+                  <div class="overview-grid">
+                    <section class="overview-panel">
+                      <div class="overview-panel-head">
+                        <h3>Recent auctions</h3>
+                        <button class="button button-ghost button-sm" type="button" data-view="auctions">Open tab</button>
+                      </div>
+                      <div class="overview-list" id="overview-auctions">
+                        <div class="overview-row"><strong>Loading…</strong></div>
+                      </div>
+                    </section>
+                    <section class="overview-panel">
+                      <div class="overview-panel-head">
+                        <h3>Needs attention</h3>
+                        <button class="button button-ghost button-sm" type="button" data-view="disputes">Open tab</button>
+                      </div>
+                      <div class="overview-list" id="overview-attention">
+                        <div class="overview-row"><strong>Loading…</strong></div>
+                      </div>
+                    </section>
+                  </div>
                 </div>
-                <p id="admin-summary" style="font-size: 14px; color: #666; margin: 0;">System status: Operational</p>
               </div>
               <div id="admin-users" class="admin-view" style="display: none;"></div>
               <div id="admin-auctions" class="admin-view" style="display: none;"></div>
@@ -82,17 +166,18 @@ export class AdminUiService {
           min-height: 600px;
         }
         .admin-sidebar {
-          background: var(--color-surface, #f8f9fa);
+          background: rgba(255, 252, 247, 0.88);
           padding: 24px;
           border-radius: 12px;
-          border: 1px solid var(--color-border, #e9ecef);
+          border: 1px solid rgba(92, 70, 44, 0.14);
           height: fit-content;
+          box-shadow: 0 14px 44px rgba(57, 37, 19, 0.08);
         }
         .sidebar-nav h3 {
           margin: 0 0 20px 0;
           font-size: 1.4rem;
           font-weight: 600;
-          color: var(--color-text, #333);
+          color: var(--text, #333);
         }
         .sidebar-link {
           width: 100%;
@@ -108,22 +193,138 @@ export class AdminUiService {
           margin-bottom: 4px;
         }
         .sidebar-link:hover {
-          background: var(--color-hover, #e9ecef);
+          background: rgba(159, 79, 47, 0.08);
           transform: translateX(2px);
         }
         .sidebar-link.active {
-          background: var(--color-primary, #007bff);
-          color: white;
-          box-shadow: 0 2px 8px rgba(0,123,255,0.2);
+          background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+          color: #fff9f3;
+          box-shadow: 0 12px 28px rgba(110, 49, 28, 0.18);
         }
         .admin-main {
           min-height: 500px;
         }
         .admin-view {
-          background: var(--color-surface, #ffffff);
+          background: rgba(255, 252, 247, 0.92);
           border-radius: 12px;
-          border: 1px solid var(--color-border, #e9ecef);
-          box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+          border: 1px solid rgba(92, 70, 44, 0.14);
+          box-shadow: 0 18px 56px rgba(57, 37, 19, 0.1);
+        }
+        .overview-shell {
+          padding: 22px;
+        }
+        .overview-header {
+          display: flex;
+          align-items: flex-end;
+          justify-content: space-between;
+          gap: 16px;
+        }
+        .overview-actions {
+          display: flex;
+          gap: 10px;
+          flex-wrap: wrap;
+          justify-content: flex-end;
+        }
+        .overview-kpis {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 14px;
+          margin-top: 18px;
+        }
+        .kpi-card {
+          border-radius: 16px;
+          border: 1px solid rgba(95, 108, 123, 0.12);
+          background: rgba(255, 255, 255, 0.76);
+          padding: 16px;
+          box-shadow: 0 16px 44px rgba(57, 37, 19, 0.08);
+        }
+        .kpi-top {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+        }
+        .kpi-label {
+          font-weight: 700;
+          color: var(--text, #1f2937);
+          letter-spacing: 0.01em;
+        }
+        .kpi-pill {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 6px 10px;
+          border-radius: 999px;
+          font-size: 0.78rem;
+          font-weight: 700;
+          color: var(--highlight, #1f6f78);
+          background: rgba(31, 111, 120, 0.1);
+          border: 1px solid rgba(31, 111, 120, 0.12);
+          white-space: nowrap;
+        }
+        .kpi-pill.warn {
+          color: var(--brand-dark, #6e311c);
+          background: rgba(159, 79, 47, 0.1);
+          border-color: rgba(159, 79, 47, 0.14);
+        }
+        .kpi-value {
+          margin-top: 10px;
+          font-size: 2rem;
+          font-weight: 800;
+          letter-spacing: -0.04em;
+          color: var(--brand-dark, #6e311c);
+        }
+        .kpi-sub {
+          margin-top: 8px;
+          color: var(--muted, #5f6c7b);
+          font-size: 0.9rem;
+          line-height: 1.4;
+        }
+        .overview-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 14px;
+          margin-top: 14px;
+        }
+        .overview-panel {
+          border-radius: 16px;
+          border: 1px solid rgba(95, 108, 123, 0.12);
+          background: rgba(255, 255, 255, 0.76);
+          padding: 16px;
+          box-shadow: 0 16px 44px rgba(57, 37, 19, 0.08);
+        }
+        .overview-panel-head {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+        }
+        .overview-panel h3 {
+          margin: 0;
+          font-size: 1.05rem;
+        }
+        .overview-list {
+          display: grid;
+          gap: 10px;
+          margin-top: 12px;
+        }
+        .overview-row {
+          padding: 12px;
+          border-radius: 14px;
+          border: 1px solid rgba(95, 108, 123, 0.1);
+          background: rgba(255, 252, 247, 0.7);
+        }
+        .overview-row strong {
+          display: block;
+          color: var(--text, #1f2937);
+        }
+        .overview-row .meta {
+          margin-top: 6px;
+          display: flex;
+          gap: 10px;
+          flex-wrap: wrap;
+          color: var(--muted, #5f6c7b);
+          font-size: 0.85rem;
         }
         .table-container {
           overflow-x: auto;
@@ -194,12 +395,12 @@ export class AdminUiService {
           flex-wrap: wrap;
         }
         .metric-card {
-          background: linear-gradient(135deg, var(--color-primary, #007bff) 0%, var(--color-primary-dark, #0056b3) 100%);
-          color: white;
+          background: linear-gradient(135deg, var(--brand) 0%, var(--brand-dark) 100%);
+          color: #fff9f3;
           padding: 16px;
-          border-radius: 8px;
+          border-radius: 14px;
           text-align: center;
-          box-shadow: 0 2px 8px rgba(0,123,255,0.15);
+          box-shadow: 0 12px 28px rgba(110, 49, 28, 0.18);
         }
         .metric-card h3 {
           margin: 4px 0 0 0;
@@ -242,6 +443,16 @@ export class AdminUiService {
           .admin-sidebar {
             order: 2;
           }
+          .overview-header {
+            align-items: flex-start;
+            flex-direction: column;
+          }
+          .overview-kpis {
+            grid-template-columns: 1fr;
+          }
+          .overview-grid {
+            grid-template-columns: 1fr;
+          }
           .table-container {
             padding: 16px;
           }
@@ -257,6 +468,7 @@ export class AdminUiService {
         const content = document.getElementById('admin-content');
         const summary = document.getElementById('admin-summary');
         const statusBox = document.getElementById('admin-status');
+        const overviewDiv = document.getElementById('admin-overview');
 
         let currentView = 'overview';
 
@@ -316,7 +528,112 @@ export class AdminUiService {
           document.getElementById('metric-auctions').textContent = String(dashboard.summary.auctions);
           document.getElementById('metric-disputes').textContent = String(dashboard.summary.disputes);
 
-          summary.textContent = 'System status: Operational';
+          const users = (dashboard.users || []).filter((u) => !u.deletedAt);
+          const auctions = (dashboard.auctions || []).filter((a) => !a.deletedAt);
+          const disputes = (dashboard.disputes || []).filter((d) => !d.deletedAt);
+          const payments = (dashboard.payments || []).filter((p) => !p.deletedAt);
+          const notifications = (dashboard.notifications || []).filter((n) => !n.deletedAt);
+          const messages = (dashboard.messages || []).filter((m) => !m.deletedAt);
+
+          const activeAuctions = auctions.filter((a) => a.status === 'ACTIVE').length;
+          const endedAuctions = auctions.filter((a) => a.status === 'ENDED').length;
+          const cancelledOrDraft = auctions.filter((a) => a.status === 'DRAFT' || a.status === 'CANCELLED').length;
+          const openDisputes = disputes.filter((d) => d.status === 'OPEN' || d.status === 'UNDER_REVIEW').length;
+          const resolvedDisputes = disputes.filter((d) => d.status === 'RESOLVED' || d.status === 'CLOSED').length;
+          const pendingPayments = payments.filter((p) => p.status === 'PENDING').length;
+          const unreadNotifications = notifications.filter((n) => !n.readAt).length;
+          const last24Hours = Date.now() - 24 * 60 * 60 * 1000;
+          const messages24h = messages.filter((m) => new Date(m.createdAt).getTime() >= last24Hours).length;
+
+          const kpiAuctionsActive = document.getElementById('kpi-auctions-active');
+          const kpiAuctionsSub = document.getElementById('kpi-auctions-sub');
+          const kpiDisputesOpen = document.getElementById('kpi-disputes-open');
+          const kpiDisputesSub = document.getElementById('kpi-disputes-sub');
+          const kpiPaymentsPending = document.getElementById('kpi-payments-pending');
+          const kpiPaymentsTotal = document.getElementById('kpi-payments-total');
+          const kpiNotificationsUnread = document.getElementById('kpi-notifications-unread');
+          const kpiNotificationsTotal = document.getElementById('kpi-notifications-total');
+          const kpiMessagesTotal = document.getElementById('kpi-messages-total');
+          const kpiMessagesSub = document.getElementById('kpi-messages-sub');
+
+          if (kpiAuctionsActive) kpiAuctionsActive.textContent = \`\${activeAuctions} active\`;
+          if (kpiAuctionsSub) kpiAuctionsSub.textContent = \`Ended: \${endedAuctions}, Draft/Cancelled: \${cancelledOrDraft}\`;
+          if (kpiDisputesOpen) kpiDisputesOpen.textContent = \`\${openDisputes} open\`;
+          if (kpiDisputesSub) kpiDisputesSub.textContent = \`Resolved: \${resolvedDisputes}\`;
+          if (kpiPaymentsPending) kpiPaymentsPending.textContent = \`\${pendingPayments} pending\`;
+          if (kpiPaymentsTotal) kpiPaymentsTotal.textContent = String(payments.length);
+          if (kpiNotificationsUnread) kpiNotificationsUnread.textContent = \`\${unreadNotifications} unread\`;
+          if (kpiNotificationsTotal) kpiNotificationsTotal.textContent = String(notifications.length);
+          if (kpiMessagesTotal) kpiMessagesTotal.textContent = String(messages.length);
+          if (kpiMessagesSub) kpiMessagesSub.textContent = \`\${messages24h} message\${messages24h === 1 ? '' : 's'} in the last 24h\`;
+
+          summary.textContent = \`System status: Operational. \${activeAuctions} live auction\${activeAuctions === 1 ? '' : 's'} running.\`;
+
+          const overviewAuctions = document.getElementById('overview-auctions');
+          const overviewAttention = document.getElementById('overview-attention');
+
+          if (overviewAuctions) {
+            const recentAuctions = auctions
+              .slice()
+              .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+              .slice(0, 6);
+
+            overviewAuctions.innerHTML = recentAuctions.length
+              ? recentAuctions.map((auction) => \`
+                  <div class="overview-row">
+                    <strong>#\${auction.id} \${auction.title}</strong>
+                    <div class="meta">
+                      <span>Status: \${auction.status}</span>
+                      <span>Ends: \${new Date(auction.endsAt).toLocaleString()}</span>
+                      <span>Seller: \${auction.seller?.displayName || auction.seller?.email || 'N/A'}</span>
+                    </div>
+                  </div>
+                \`).join('')
+              : '<div class="overview-row"><strong>No auctions yet.</strong></div>';
+          }
+
+          if (overviewAttention) {
+            const attentionItems = [];
+
+            const attentionDisputes = disputes
+              .filter((d) => d.status === 'OPEN' || d.status === 'UNDER_REVIEW')
+              .slice()
+              .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+              .slice(0, 4)
+              .map((dispute) => ({
+                title: \`Dispute #\${dispute.id}: \${dispute.auction?.title || 'Auction'}\`,
+                meta: [
+                  \`Status: \${dispute.status}\`,
+                  \`Raised by: \${dispute.raisedBy?.displayName || dispute.raisedBy?.email || 'N/A'}\`,
+                  \`Created: \${new Date(dispute.createdAt).toLocaleDateString()}\`,
+                ],
+              }));
+
+            const attentionPayments = payments
+              .filter((p) => p.status === 'PENDING')
+              .slice()
+              .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+              .slice(0, 3)
+              .map((payment) => ({
+                title: \`Payment #\${payment.id}: \${payment.auction?.title || 'Auction payment'}\`,
+                meta: [
+                  \`Amount: \${formatMoney(payment.amount)}\`,
+                  \`Payer: \${payment.payer?.displayName || payment.payer?.email || 'N/A'}\`,
+                  \`Created: \${new Date(payment.createdAt).toLocaleDateString()}\`,
+                ],
+              }));
+
+            attentionItems.push(...attentionDisputes, ...attentionPayments);
+
+            overviewAttention.innerHTML = attentionItems.length
+              ? attentionItems.slice(0, 6).map((item) => \`
+                  <div class="overview-row">
+                    <strong>\${item.title}</strong>
+                    <div class="meta">\${item.meta.map((m) => \`<span>\${m}</span>\`).join('')}</div>
+                  </div>
+                \`).join('')
+              : '<div class="overview-row"><strong>No outstanding disputes or pending payments.</strong></div>';
+          }
 
           // Populate individual views
           const usersDiv = document.getElementById('admin-users');
