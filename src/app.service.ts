@@ -221,8 +221,26 @@ export class AppService {
       </main>
       <script>
         const existingToken = localStorage.getItem('auctionHouseToken');
-        if (existingToken) {
+        const redirectForRole = async (token) => {
+          try {
+            const response = await fetch('/users/me', {
+              headers: {
+                Authorization: 'Bearer ' + token,
+              },
+            });
+            const profile = await response.json().catch(() => null);
+            if (response.ok && profile?.role === 'ADMIN') {
+              window.location.replace('/admin/dashboard');
+              return;
+            }
+          } catch {
+            // Fall back to default redirect.
+          }
           window.location.replace('/seller/auctions');
+        };
+
+        if (existingToken) {
+          redirectForRole(existingToken);
         }
 
         const form = document.getElementById('login-form');
@@ -255,9 +273,9 @@ export class AppService {
             if (data?.access_token) {
               localStorage.setItem('auctionHouseToken', data.access_token);
             }
-            status.textContent = 'Login successful. Redirecting to your auction dashboard...';
+            status.textContent = 'Login successful. Redirecting...';
             window.setTimeout(() => {
-              window.location.href = '/seller/auctions';
+              redirectForRole(data?.access_token || localStorage.getItem('auctionHouseToken'));
             }, 700);
           } catch (error) {
             status.className = 'status error visible';
