@@ -51,7 +51,7 @@ INSERT INTO auctions (
     '2026-03-18T14:00:00Z', '2026-03-28T18:00:00Z', 500000.00, 1000000.00,
     'Photographic reproduction sourced from the Metropolitan Museum of Art (Jefferson R. Burdick Collection).',
     'New York, USA', 'Insured shipping. Adult signature required. International shipping on request.',
-    4, 4,
+    NULL, NULL,
     '2026-03-10T12:00:00Z', '2026-03-28T18:10:00Z', NULL
   ),
   (
@@ -62,7 +62,7 @@ INSERT INTO auctions (
     '2026-04-05T10:00:00Z', '2026-04-20T20:00:00Z', 2000000.00, 3000000.00,
     'Event photo of a CGC 9.0 copy displayed by Metropolis Collectibles (New York Comic Con).',
     'Los Angeles, USA', 'Armored shipping. Bank wire only. Local pickup available.',
-    7, NULL,
+    NULL, NULL,
     '2026-04-05T09:55:00Z', '2026-04-10T11:00:00Z', NULL
   ),
   (
@@ -73,7 +73,7 @@ INSERT INTO auctions (
     '2026-04-08T09:00:00Z', '2026-04-18T19:30:00Z', 6500.00, NULL,
     'Seller-provided photos; full set documented in listing.',
     'London, United Kingdom', 'Tracked and insured shipping included in UK. EU/US shipping quoted via messages.',
-    10, NULL,
+    NULL, NULL,
     '2026-04-08T08:45:00Z', '2026-04-10T12:30:00Z', NULL
   ),
   (
@@ -84,7 +84,7 @@ INSERT INTO auctions (
     '2026-03-22T10:00:00Z', '2026-04-01T18:00:00Z', 100000.00, 200000.00,
     'Photographed Apple I at the Science Museum; used here for demo purposes with clear attribution.',
     'San Jose, USA', 'Escrow recommended. Insured freight shipping.',
-    13, 13,
+    NULL, NULL,
     '2026-03-20T08:00:00Z', '2026-04-01T18:05:00Z', NULL
   ),
   (
@@ -106,7 +106,7 @@ INSERT INTO auctions (
     '2026-03-25T12:00:00Z', '2026-04-02T16:00:00Z', 15000.00, 50000.00,
     'Seller-provided photos; replica attributed in listing.',
     'St. Petersburg, Russia', 'Insured shipping; customs paperwork handled by seller.',
-    16, NULL,
+    NULL, NULL,
     '2026-03-20T12:00:00Z', '2026-04-02T16:02:00Z', NULL
   );
 
