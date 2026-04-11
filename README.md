@@ -1,25 +1,39 @@
 ## Rare Collectible Auction House
 
-coursework backend (NestJS on **Express** via `@nestjs/platform-express`). Controllers expose REST-shaped routes; services hold stub logic until persistence and auth are added. This is a structured **module/controller/service** layout (similar to MVC routing + logic layers), not a production deployment.
+Coursework backend (NestJS on **Express** via `@nestjs/platform-express`) with PostgreSQL persistence (TypeORM), JWT auth, and a small server-rendered HTML UI (no separate frontend build). This follows a structured **module/controller/service** layout (similar to MVC routing + logic layers) and is not a production deployment.
 
 **ERD (soft delete + FK policy):** [docs/architecture-and-data-model.md](docs/architecture-and-data-model.md).
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter, extended with domain modules under `src/modules/`.
 
-### API map (stubs)
+### API map
 
 | Area          | Base path                                                                                                 | Notes                                                                            |
 | ------------- | --------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| Health        | `GET /`, `GET /test`                                                                                      |                                                                                  |
-| Auth          | `POST /auth/register`, `POST /auth/login`, `GET /auth/test`                                               | JWT/password hashing TODO                                                        |
-| Users         | `GET/PATCH /users/me`, `GET /users/me/auction-history`, `GET /users/test`                                 | Auth context TODO                                                                |
-| Auctions      | `GET/POST /auctions`, `GET /auctions/:id`, `GET /auctions/test`                                           |                                                                                  |
-| Bids          | `POST /auctions/:auctionId/bids`, `GET /auctions/:auctionId/bids`, `GET /users/me/bids`, `GET /bids/test` |                                                                                  |
-| Messages      | `GET/POST /messages`, `GET /messages/test`                                                                |                                                                                  |
-| Notifications | `GET /notifications`, `GET /notifications/test`                                                           |                                                                                  |
-| Disputes      | `GET/POST /disputes`, `GET /disputes/test`                                                                |                                                                                  |
-| Payments      | `GET /payments`, `GET /payments/test`                                                                     | Protect for admin later                                                          |
-| Admin         | `GET /admin/*`, `GET /admin/test`                                                                         | `users`, `auctions`, `bids`, `messages`, `notifications`, `disputes`, `payments` |
+| Health        | `GET /health`, `GET /test`                                                                                | `GET /` serves the public landing page (HTML).                                   |
+| Auth          | `POST /auth/register`, `POST /auth/login`                                                                 | JWT (Bearer token) + bcrypt password hashing.                                    |
+| Users         | `GET /users/me`, `PATCH /users/me`                                                                        | Profile: contact info + preferences.                                             |
+| Auctions      | `GET /auctions`, `GET /auctions/:id`                                                                      | Public marketplace listing + detail.                                             |
+|              | `GET /auctions/mine/list`, `GET /auctions/mine/:id`, `POST/PATCH/DELETE /auctions/mine/*`                  | Seller-owned listing management.                                                 |
+|              | `POST /auctions/mine/:id/publish`, `POST /auctions/mine/:id/cancel`                                        | Seller status actions.                                                           |
+| Bids          | `GET /auctions/:auctionId/bids`, `POST /auctions/:auctionId/bids`, `GET /users/me/bids`                   | Enforces min-next-bid rules; no self-bidding.                                    |
+| Messages      | `GET /messages/inbox`, `GET/POST /auctions/:auctionId/messages`                                            | Buyer/seller communication grouped by auction.                                   |
+| Notifications | `GET /notifications`, `GET /notifications/summary`, `PATCH /notifications/read-all`, `PATCH /notifications/:id/read` | Used by notification dropdown + notifications page (polling).                    |
+| Disputes      | `GET /disputes/mine`, `GET /disputes/eligible-auctions`, `GET /disputes/:id`, `POST /disputes`            | Sellers/winners can raise disputes for ended auctions with evidence URLs.        |
+| Payments      | `GET /payments`                                                                                            | Admin-only payment history for ended auctions.                                   |
+| Admin         | `GET /admin/api/dashboard`                                                                                | Admin overview across users/auctions/bids/messages/notifications/disputes/payments. |
+|              | `GET /admin/users`, `PATCH /admin/users/:id/status`                                                       | Basic user moderation (suspend/reactivate).                                      |
+|              | `GET /admin/auctions`, `PATCH /admin/auctions/:id/status`                                                 | Basic auction moderation (status changes).                                       |
+|              | `GET /admin/bids`, `GET /admin/messages`, `GET /admin/notifications`, `GET /admin/disputes`, `GET /admin/payments` | Read-only listings.                                                              |
+|              | `PATCH /admin/disputes/:id/resolve`                                                                       | Resolve disputes with a structured outcome.                                      |
+
+### Pages (server-rendered HTML)
+
+- Public: `GET /` (landing), `GET /marketplace`, `GET /marketplace/:id`, `GET /login`, `GET /register`, `GET /api`
+- Authenticated: `GET /profile`, `GET /seller/auctions`, `GET /seller/auctions/new`, `GET /seller/auctions/:id/edit`, `GET /bids`, `GET /messages`, `GET /notifications/page`, `GET /disputes`
+- Admin: `GET /admin/dashboard`
+
+The HTML pages store the JWT in `localStorage` under `auctionHouseToken` and call the API using `Authorization: Bearer <token>`.
 
 Frontend (e.g. React) can call this API with **CORS** enabled in `main.ts`. Copy `.env.example` to `.env` for `PORT`, `CORS_ORIGIN`, and database settings.
 
@@ -27,7 +41,9 @@ Frontend (e.g. React) can call this API with **CORS** enabled in `main.ts`. Copy
 
 - **Entities:** `src/database/entities/` (User, Auction, AuctionImage, Bid, Message, Notification, Dispute, Payment) — each has **`deleted_at`** for soft delete.
 - **CLI data source:** `src/database/data-source.ts` (used by TypeORM CLI; loads `.env` from the project root).
-- **Migrations:** `1743345600000-initial-schema.ts`, then `1743345700000-soft-delete-and-no-action-fks.ts` (`deleted_at` on all tables, `is_deleted` removed, FK `ON DELETE` aligned with soft delete).
+- **Migrations:** `1743345600000-initial-schema.ts`, `1743345700000-soft-delete-and-no-action-fks.ts`, `1775752500000-auction-listing-enhancements.ts`.
+
+Admin seeding on startup (local/dev): set `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_DISPLAY_NAME` in `.env`. The seed runs on startup and will create the admin user if missing, or update the existing record to ensure role/password/status match the env values.
 
 Start PostgreSQL (example with Docker):
 
@@ -48,6 +64,8 @@ Optional: set `DB_MIGRATIONS_RUN=true` in `.env` to run migrations automatically
 **Note:** `npm run test:e2e` uses a slim `AppE2eModule` so it does not require PostgreSQL. Full `AppModule` integration tests need a reachable database.
 
 ## Project setup
+
+Requires Node.js `>= 20` (see `package.json` `engines` and `.nvmrc`).
 
 ```bash
 $ npm install

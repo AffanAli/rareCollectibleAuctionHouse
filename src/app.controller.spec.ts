@@ -25,7 +25,9 @@ describe('AppController', () => {
       expect(appController.getLandingPage()).toContain(
         'Rare Collectible Auction House',
       );
-      expect(appController.getLandingPage()).toContain('Create your account');
+      expect(appController.getLandingPage()).toContain(
+        "The collector's marketplace",
+      );
     });
   });
 });

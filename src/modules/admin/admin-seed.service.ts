@@ -20,6 +20,36 @@ export class AdminSeedService implements OnModuleInit {
     });
 
     if (existingAdmin) {
+      const updates: Partial<typeof existingAdmin> = {};
+
+      if (existingAdmin.role !== UserRole.Admin) {
+        updates.role = UserRole.Admin;
+      }
+
+      if (!existingAdmin.isActive) {
+        updates.isActive = true;
+      }
+
+      if (displayName && existingAdmin.displayName !== displayName) {
+        updates.displayName = displayName;
+      }
+
+      const passwordMatches = await bcrypt.compare(
+        password,
+        existingAdmin.passwordHash,
+      );
+
+      if (!passwordMatches) {
+        updates.passwordHash = await bcrypt.hash(password, 10);
+      }
+
+      if (Object.keys(updates).length > 0) {
+        await this.usersService.repo.save({
+          ...existingAdmin,
+          ...updates,
+        });
+      }
+
       return;
     }
 
