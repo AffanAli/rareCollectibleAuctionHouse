@@ -35,7 +35,11 @@ export class AdminService {
       await Promise.all([
         this.usersRepo.find(),
         this.auctionsRepo.find({
-          relations: { seller: true, winningBid: { bidder: true } },
+          relations: {
+            seller: true,
+            currentHighBid: { bidder: true },
+            winningBid: { bidder: true },
+          },
           order: { updatedAt: 'DESC' },
         }),
         this.bidsRepo.find({

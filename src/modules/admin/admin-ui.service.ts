@@ -261,7 +261,6 @@ export class AdminUiService {
         let currentView = 'overview';
 
         const api = async (path, options = {}) => {
-          console.log('API call to:', path, 'with token:', token);
           const response = await fetch(path, {
             ...options,
             headers: {
@@ -270,10 +269,8 @@ export class AdminUiService {
               ...(options.headers || {}),
             },
           });
-          console.log('Response status:', response.status);
           const data = await response.json().catch(() => null);
           if (!response.ok) {
-            console.log('API error:', data);
             throw new Error(data?.message || 'Request failed.');
           }
           return data;
@@ -353,7 +350,7 @@ export class AdminUiService {
               auction.title,
               \`<span class="status-\${auction.status.toLowerCase()}">\${auction.status}</span>\`,
               auction.seller.displayName || auction.seller.email,
-              formatMoney(auction.currentBid || 0),
+              formatMoney(auction.currentHighBid?.amount || auction.winningBid?.amount || auction.startingPrice || 0),
               new Date(auction.endsAt).toLocaleString()
             ]),
             auctionActions
@@ -373,7 +370,7 @@ export class AdminUiService {
             dashboard.disputes.slice(0, 50).map(dispute => [
               dispute.id,
               dispute.auction.title,
-              \`<span class="status-\${dispute.status.toLowerCase().replace(' ', '-')}">\${dispute.status}</span>\`,
+              \`<span class="status-\${String(dispute.status || '').toLowerCase().replaceAll('_', '-')}">\${dispute.status}</span>\`,
               dispute.raisedBy.displayName || dispute.raisedBy.email,
               new Date(dispute.createdAt).toLocaleDateString()
             ]),
@@ -398,8 +395,8 @@ export class AdminUiService {
             (dashboard.messages?.slice(0, 50) || []).map(message => [
               message.id,
               message.sender.displayName || message.sender.email,
-              message.recipient.displayName || message.recipient.email,
-              message.content.length > 50 ? message.content.substring(0, 50) + '...' : message.content,
+              message.recipient ? (message.recipient.displayName || message.recipient.email) : 'N/A',
+              (message.body || '').length > 50 ? (message.body || '').substring(0, 50) + '...' : (message.body || ''),
               new Date(message.createdAt).toLocaleString()
             ])
           );
@@ -409,9 +406,9 @@ export class AdminUiService {
             (dashboard.notifications?.slice(0, 50) || []).map(notification => [
               notification.id,
               notification.title,
-              notification.message.length > 50 ? notification.message.substring(0, 50) + '...' : notification.message,
+              (notification.body || '').length > 50 ? (notification.body || '').substring(0, 50) + '...' : (notification.body || ''),
               notification.user.displayName || notification.user.email,
-              notification.isRead ? 'Yes' : 'No',
+              notification.readAt ? 'Yes' : 'No',
               new Date(notification.createdAt).toLocaleDateString()
             ])
           );
