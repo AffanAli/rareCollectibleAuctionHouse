@@ -25,12 +25,32 @@ services:
       DB_NAME: auction_house
       DB_MIGRATIONS_RUN: true
       DB_LOGGING: true
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@rare-collectibles.local}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-RareCollectiblesAdmin#2026!}
+      ADMIN_DISPLAY_NAME: ${ADMIN_DISPLAY_NAME:-Platform Administrator}
       CHOKIDAR_USEPOLLING: true
     depends_on:
       - postgres
     volumes:
       - .:/app
       - /app/node_modules
+
+  demo_import:
+    image: postgres:16-alpine
+    profiles: ['demo']
+    container_name: auction_demo_import
+    depends_on:
+      - postgres
+    environment:
+      PGPASSWORD: postgres
+    volumes:
+      - ./demo/demo_seed.sql:/seed/demo_seed.sql:ro
+    entrypoint:
+      [
+        'sh',
+        '-c',
+        'until pg_isready -h postgres -p 5432 -U postgres; do sleep 1; done; psql -h postgres -U postgres -d auction_house -f /seed/demo_seed.sql',
+      ]
 
 volumes:
   auction_pg_data:

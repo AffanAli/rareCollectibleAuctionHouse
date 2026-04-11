@@ -45,6 +45,14 @@ Frontend (e.g. React) can call this API with **CORS** enabled in `main.ts`. Copy
 
 Admin seeding on startup (local/dev): set `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `ADMIN_DISPLAY_NAME` in `.env`. The seed runs on startup and will create the admin user if missing, or update the existing record to ensure role/password/status match the env values.
 
+Demo data import (Docker):
+
+```bash
+docker compose --profile demo run --rm demo_import
+```
+
+The demo SQL sets all demo account passwords to `123456`. If you want the seeded admin to stay `123456` in Docker, run the backend with `ADMIN_PASSWORD=123456` (see `docker-compose.yml`).
+
 Start PostgreSQL (example with Docker):
 
 ```bash
